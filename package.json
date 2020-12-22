@@ -1,0 +1,235 @@
+{
+    "name": "pm2t",
+    "preferGlobal": true,
+    "version": "4.5.11",
+    "engines": {
+        "node": ">=8.10.0"
+    },
+    "directories": {
+        "bin": "./bin",
+        "lib": "./lib2",
+        "example": "./examples"
+    },
+    "author": {
+        "name": "Strzelewicz Alexandre",
+        "email": "alexandre@pm2.io",
+        "url": "https://pm2.io"
+    },
+    "maintainers": [
+        {
+            "name": "Alexandre Strzelewicz",
+            "email": "alexandre@pm2.io"
+        },
+        {
+            "name": "Antoine Bluchet",
+            "email": "antoine@pm2.io"
+        }
+    ],
+    "contributors": [
+        {
+            "name": "Alex Kocharin",
+            "email": "alex@kocharin.ru"
+        },
+        {
+            "name": "Antoine Bluchet",
+            "email": "soyuka@gmail.com"
+        },
+        {
+            "name": "Subhash Burramsetty"
+        },
+        {
+            "name": "Valentin Marchaud",
+            "email": "thisismac47@gmail.com"
+        },
+        {
+            "name": "Valentin Touffet",
+            "email": "contact@eywek.fr"
+        },
+        {
+            "name": "Florian Hermouet-Joscht",
+            "email": "florian@keymetrics.io"
+        },
+        {
+            "name": "Vincent Vallet",
+            "email": "wallet77@gmail.com"
+        },
+        {
+            "name": "Joni Shkurti",
+            "email": "jonishkurti90@gmail.com"
+        },
+        {
+            "name": "Jun Tjatse",
+            "email": "thisnamemeansnothing@gmail.com"
+        },
+        {
+            "name": "Xu Jingxin",
+            "email": "sailxjx@gmail.com"
+        },
+        {
+            "name": "Ben Postlethwaite",
+            "email": "post.ben.here@gmail.com"
+        },
+        {
+            "name": "Devo.ps",
+            "email": "contact@devo.ps"
+        },
+        {
+            "name": "Bret Copeland",
+            "email": "bret@atlantisflight.org"
+        },
+        {
+            "name": "John Hurliman",
+            "email": "jhurliman@jhurliman.org"
+        },
+        {
+            "name": "TruongSinh Tran-Nguyen",
+            "email": "i@truongsinh.pro"
+        },
+        {
+            "name": "Michael Hueuberger",
+            "email": "michael.heuberger@binarykitchen.com"
+        },
+        {
+            "name": "Chris Wiggins",
+            "email": "chris@chriswiggins.co.nz"
+        }
+    ],
+    "homepage": "http://pm2.keymetrics.io/",
+    "description": "Production process manager for Node.JS applications with a built-in load balancer.",
+    "main": "index.js",
+    "types": "types/index.d.ts",
+    "scripts": {
+        "clean:build": "rimraf lib2",
+        "start": "node -r ts-node/register ./src/binaries/CLI.ts",
+        "start:bin": "node ./bin/pm2t",
+        "start:ts": "ts-node ./src/binaries/CLI",
+        "type-check": "tsc -p tsconfig.types.json --noEmit",
+        "build:lib": "babel src --out-dir lib2 --extensions \".js,.ts,.tsx\"",
+        "build": "npm run clean:build && npm run build:lib",
+        "test": "bash test/unit.sh && bash test/e2e.sh"
+    },
+    "keywords": [
+        "cli",
+        "fault tolerant",
+        "sysadmin",
+        "tools",
+        "pm2",
+        "logs",
+        "log",
+        "json",
+        "express",
+        "hapi",
+        "kraken",
+        "reload",
+        "load balancer",
+        "lb",
+        "load-balancer",
+        "kubernetes",
+        "k8s",
+        "pm2-docker",
+        "runtime",
+        "source maps",
+        "graceful",
+        "microservice",
+        "programmatic",
+        "harmony",
+        "node-pm2",
+        "production",
+        "keymetrics",
+        "node.js monitoring",
+        "strong-pm",
+        "deploy",
+        "deployment",
+        "daemon",
+        "supervisor",
+        "supervisord",
+        "nodemon",
+        "pm2.io",
+        "ghost",
+        "ghost production",
+        "monitoring",
+        "keymetrics",
+        "process manager",
+        "forever",
+        "profiling",
+        "probes",
+        "apm",
+        "container",
+        "forever-monitor",
+        "keep process alive",
+        "process configuration",
+        "clustering",
+        "cluster cli",
+        "cluster",
+        "docker",
+        "cron",
+        "devops",
+        "dev ops"
+    ],
+    "bin": {
+        "pm2t": "./bin/pm2t",
+        "pm2t-dev": "./bin/pm2t-dev",
+        "pm2t-docker": "./bin/pm2t-docker",
+        "pm2t-runtime": "./bin/pm2t-runtime"
+    },
+    "dependencies": {
+        "@babel/runtime": "^7.11.2",
+        "pm2t-io-agent": "~1.0.4",
+        "pm2t-io-apm": "~4.3.5",
+        "@pm2/js-api": "~0.6.0",
+        "@pm2/pm2-version-check": "latest",
+        "async": "~3.2.0",
+        "blessed": "0.1.81",
+        "chalk": "3.0.0",
+        "chokidar": "^3.3.0",
+        "cli-tableau": "^2.0.0",
+        "commander": "5.1.0",
+        "cron": "1.8.2",
+        "dayjs": "~1.8.25",
+        "debug": "^4.2.0",
+        "enquirer": "2.3.6",
+        "eventemitter2": "5.0.1",
+        "fclone": "1.0.11",
+        "mkdirp": "1.0.4",
+        "moment": "^2.29.1",
+        "needle": "2.4.0",
+        "pidusage": "2.0.21",
+        "pm2-axon": "4.0.0",
+        "pm2-axon-rpc": "0.6.0",
+        "pm2-deploy": "~1.0.2",
+        "pm2t-deploy": "~1.0.3",
+        "pm2-multimeter": "^0.1.2",
+        "promptly": "^2",
+        "ps-list": "6.3.0",
+        "rimraf": "^3.0.2",
+        "semver": "^7.2",
+        "source-map-support": "0.5.19",
+        "sprintf-js": "1.1.2",
+        "vizion": "0.2.13",
+        "yamljs": "0.3.0"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.11.6",
+        "@babel/core": "^7.11.6",
+        "@babel/plugin-transform-runtime": "^7.11.5",
+        "@babel/preset-env": "^7.11.5",
+        "@babel/preset-typescript": "^7.10.4",
+        "@types/node": "^14.11.8",
+        "babel-plugin-module-resolver": "^4.0.0",
+        "mocha": "^7.1.0",
+        "should": "^13",
+        "ts-node": "^9.0.0",
+        "typescript": "^4.0.3"
+    },
+    "optionalDependencies": {
+        "systeminformation": "^4.23.3"
+    },
+    "bugs": {
+        "url": "https://github.com/Unitech/pm2/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/Unitech/pm2.git"
+    },
+    "license": "AGPL-3.0"
+}
