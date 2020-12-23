@@ -19,7 +19,7 @@ const debug = debugLogger('pm2:cli');
 Common.determineSilentCLI();
 Common.printVersion();
 
-var pm2: any = new PM2();
+var pm2 = new PM2();
 
 PM2ioHandler.usePM2Client(pm2)
 

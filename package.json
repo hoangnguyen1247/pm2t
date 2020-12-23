@@ -103,6 +103,7 @@
         "start": "node -r ts-node/register ./src/binaries/CLI.ts",
         "start:bin": "node ./bin/pm2t",
         "start:ts": "ts-node ./src/binaries/CLI",
+        "dev": "ts-node ./src/binaries/CLI",
         "type-check": "tsc -p tsconfig.types.json --noEmit",
         "build:lib": "babel src --out-dir lib2 --extensions \".js,.ts,.tsx\"",
         "build": "npm run clean:build && npm run build:lib",
