@@ -1,6 +1,6 @@
 
 setTimeout(function() {
-  Promise.reject();
+    Promise.reject();
 }, 1000);
 
 setInterval(function() {

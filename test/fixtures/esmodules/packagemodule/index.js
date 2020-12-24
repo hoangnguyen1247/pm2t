@@ -1,4 +1,4 @@
-import { area, circumference } from './circle.js';
+import { area, circumference } from "./circle.js";
 
 const r = 3;
 
@@ -7,4 +7,4 @@ console.log(`Circle with radius ${r} has
   circunference: ${circumference(r)}`);
 
 setInterval(() => {
-}, 1000)
+}, 1000);

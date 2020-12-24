@@ -4,9 +4,9 @@
  * can be found in the LICENSE file.
  */
 
-process.env.PM2_PROGRAMMATIC = 'true';
+process.env.PM2_PROGRAMMATIC = "true";
 
-var API = require('./lib2/API/index.js');
+var API = require("./lib2/API/index.js");
 
 module.exports = new API();
 module.exports.custom = API;

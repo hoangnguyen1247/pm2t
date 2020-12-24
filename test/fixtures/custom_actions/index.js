@@ -1,12 +1,12 @@
 
-var pmx = require('@pm2/io');
+var pmx = require("@pm2/io");
 
-pmx.action('ping', function(reply) {
-  return reply({ 'pong' : 'hehe' })
+pmx.action("ping", function(reply) {
+    return reply({ "pong" : "hehe" });
 });
 
-pmx.action('param', function(data, reply) {
-  return reply(data)
+pmx.action("param", function(data, reply) {
+    return reply(data);
 });
 
 setInterval(function() {

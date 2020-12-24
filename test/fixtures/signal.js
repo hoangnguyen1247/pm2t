@@ -1,9 +1,9 @@
 
 
 setInterval(function() {
-  console.log('ok');
+    console.log("ok");
 }, 1000);
 
-process.on('SIGUSR2', function () {
-  console.log('SIGUSR2');
+process.on("SIGUSR2", function () {
+    console.log("SIGUSR2");
 });

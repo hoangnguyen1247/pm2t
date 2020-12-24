@@ -26,4 +26,4 @@ module.exports = {
         "@babel/plugin-transform-runtime",
     ],
     "sourceMaps": false
-}
+};

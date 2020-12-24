@@ -1,6 +1,6 @@
 
-console.log('HEY!');
+console.log("HEY!");
 
 setTimeout(function() {
-  process.exit(1);
+    process.exit(1);
 }, 3000);

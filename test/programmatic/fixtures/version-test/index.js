@@ -1,4 +1,4 @@
 
 setInterval(function() {
-  console.log('HEY')
-}, 1000)
+    console.log("HEY");
+}, 1000);

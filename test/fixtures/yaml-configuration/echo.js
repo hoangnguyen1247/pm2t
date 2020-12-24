@@ -1,8 +1,8 @@
 
 setInterval(function() {
-  console.log('ok');
+    console.log("ok");
 }, 100);
 
 setInterval(function() {
-  console.error('thisnok');
+    console.error("thisnok");
 }, 100);

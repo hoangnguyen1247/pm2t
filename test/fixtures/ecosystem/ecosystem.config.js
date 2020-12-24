@@ -1,4 +1,4 @@
 
 module.exports = {
-  script: 'unknown.js'
-}
+    script: "unknown.js"
+};

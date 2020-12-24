@@ -1,6 +1,7 @@
 node_modules
 
 /lib
+/lib2
 /templates
 /packager
 /examples

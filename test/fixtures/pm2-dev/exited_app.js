@@ -1,2 +1,2 @@
 
-throw new Error('exit')
+throw new Error("exit");

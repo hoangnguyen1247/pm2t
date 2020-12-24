@@ -1,7 +1,7 @@
 
 
-console.log('outmsg');
+console.log("outmsg");
 
-console.error('errmsg');
+console.error("errmsg");
 
 setInterval(function() {}, 100);

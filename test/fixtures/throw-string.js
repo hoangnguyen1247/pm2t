@@ -1,6 +1,6 @@
 
 function crash() {
-  throw 'crashed';
+    throw "crashed";
 }
 
 crash();

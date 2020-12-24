@@ -1,14 +1,14 @@
 module.exports = {
 
-  apps : [
+    apps : [
 
 
-    {
-      name      : 'Test es6 modules',
-      script    : 'index.mjs',
-      node_args : '--experimental-modules'
-    }
-  ],
+        {
+            name      : "Test es6 modules",
+            script    : "index.mjs",
+            node_args : "--experimental-modules"
+        }
+    ],
 
 
 };

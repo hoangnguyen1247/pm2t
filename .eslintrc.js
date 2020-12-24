@@ -5,8 +5,8 @@ module.exports = {
     "env": {
         "es6": true,
         "browser": true,
-        "jest": true,
-        "node": true
+        "mocha": true,
+        "node": true,
     },
     "rules": {
         "@typescript-eslint/no-empty-function": 0,
@@ -28,9 +28,10 @@ module.exports = {
         "curly": [2, "all"],
         "brace-style": [ 2, "1tbs" ],
         "no-empty": 0,
-        "no-empty-function": [ 2, { "allow": [ "arrowFunctions" ] }],
+        "no-empty-function": [ 2, { "allow": [ "functions", "methods", "arrowFunctions" ] }],
         "no-console": 0,
         "no-control-regex": 0,
         "no-useless-escape": 0,
+        "no-octal": 0,
     }
-}
+};
