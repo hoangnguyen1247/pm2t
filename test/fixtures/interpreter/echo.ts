@@ -1,11 +1,14 @@
 
 class Greeter {
-  constructor(public greeting: string) { }
-  greet() {
-    return this.greeting;
-  }
-};
+    greeting: string;
+    constructor(greeting: string) { 
+        this.greeting = greeting;
+    }
+    greet() {
+        return this.greeting;
+    }
+}
 
-var greeter = new Greeter("Hello Typescript!");
+const greeter = new Greeter("Hello Typescript!");
 
 console.log(greeter.greet());

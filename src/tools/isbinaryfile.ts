@@ -3,40 +3,46 @@
  * Use of this source code is governed by a license that
  * can be found in the LICENSE file.
  */
-import fs from 'fs';
-var max_bytes = 512;
+import fs from "fs";
+
+const max_bytes = 512;
 
 export default function (bytes, size?) {
     // Read the file with no encoding for raw buffer access.
     if (size === undefined) {
-        var file = bytes;
+        const file = bytes;
         try {
-            if (!fs.statSync(file).isFile()) return false;
+            if (!fs.statSync(file).isFile()) {
+                return false;
+            }
         } catch (err) {
             // otherwise continue on
         }
-        var descriptor = fs.openSync(file, 'r');
+        const descriptor = fs.openSync(file, "r");
         try {
             bytes = Buffer.alloc(max_bytes);
             size = fs.readSync(descriptor, bytes, 0, bytes.length, 0);
         } finally {
             fs.closeSync(descriptor);
         }
-    }
-    // async version has a function instead of a `size`
-    else if (typeof size === "function") {
-        var file = bytes, callback = size;
+    } else if (typeof size === "function") { // async version has a function instead of a `size`
+        const file = bytes, callback = size;
         fs.stat(file, function (err, stat) {
-            if (err || !stat.isFile()) return callback(null, false);
+            if (err || !stat.isFile()) {
+                return callback(null, false);
+            }
 
-            fs.open(file, 'r', function (err, descriptor) {
-                if (err) return callback(err);
-                var bytes = Buffer.alloc(max_bytes);
+            fs.open(file, "r", function (err, descriptor) {
+                if (err) {
+                    return callback(err);
+                }
+                const bytes = Buffer.alloc(max_bytes);
                 // Read the file with no encoding for raw buffer access.
                 fs.read(descriptor, bytes, 0, bytes.length, 0, function (err, size, bytes) {
                     fs.close(descriptor, function (err2) {
-                        if (err || err2)
+                        if (err || err2) {
                             return callback(err || err2);
+                        }
                         return callback(null, isBinaryCheck(bytes, size));
                     });
                 });
@@ -48,18 +54,19 @@ export default function (bytes, size?) {
 }
 
 function isBinaryCheck(bytes, size) {
-    if (size === 0)
+    if (size === 0) {
         return false;
+    }
 
-    var suspicious_bytes = 0;
-    var total_bytes = Math.min(size, max_bytes);
+    let suspicious_bytes = 0;
+    const total_bytes = Math.min(size, max_bytes);
 
     if (size >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF) {
         // UTF-8 BOM. This isn't binary.
         return false;
     }
 
-    for (var i = 0; i < total_bytes; i++) {
+    for (let i = 0; i < total_bytes; i++) {
         if (bytes[i] === 0) { // NULL byte--it's binary!
             return true;
         } else if ((bytes[i] < 7 || bytes[i] > 14) && (bytes[i] < 32 || bytes[i] > 127)) {
@@ -69,8 +76,7 @@ function isBinaryCheck(bytes, size) {
                 if (bytes[i] > 127 && bytes[i] < 192) {
                     continue;
                 }
-            }
-            else if (bytes[i] > 223 && bytes[i] < 240 && i + 2 < total_bytes) {
+            } else if (bytes[i] > 223 && bytes[i] < 240 && i + 2 < total_bytes) {
                 i++;
                 if (bytes[i] > 127 && bytes[i] < 192 && bytes[i + 1] > 127 && bytes[i + 1] < 192) {
                     i++;

@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-import path from 'path'
-import fs from 'fs'
+import path from "path";
+import fs from "fs";
 
 /**
  * Attempt to somewhat safely parse the JSON.
@@ -11,16 +11,21 @@ import fs from 'fs'
  * @api private
  */
 function parse(data) {
-    data = data.toString('utf-8');
+    data = data.toString("utf-8");
 
     //
     // Remove a possible UTF-8 BOM (byte order marker) as this can lead to parse
     // values when passed in to the JSON.parse.
     //
-    if (data.charCodeAt(0) === 0xFEFF) data = data.slice(1);
+    if (data.charCodeAt(0) === 0xFEFF) {
+        data = data.slice(1);
+    }
 
-    try { return JSON.parse(data); }
-    catch (e) { return false; }
+    try {
+        return JSON.parse(data); 
+    } catch (e) {
+        return false; 
+    }
 }
 
 /**
@@ -33,7 +38,7 @@ function parse(data) {
 export default function find(root) {
     root = root || process.cwd();
     if (typeof root !== "string") {
-        if (typeof root === "object" && typeof root.filename === 'string') {
+        if (typeof root === "object" && typeof root.filename === "string") {
             root = root.filename;
         } else {
             throw new Error("Must pass a filename string or a module object to finder");
@@ -47,16 +52,18 @@ export default function find(root) {
          * @api public
          */
         next: function next() {
-            if (root.match(/^(\w:\\|\/)$/)) return {
-                value: undefined,
-                filename: undefined,
-                done: true
-            };
+            if (root.match(/^(\w:\\|\/)$/)) {
+                return {
+                    value: undefined,
+                    filename: undefined,
+                    done: true
+                };
+            }
 
-            var file = path.join(root, 'package.json')
-                , data;
+            const file = path.join(root, "package.json");
+            let data;
 
-            root = path.resolve(root, '..');
+            root = path.resolve(root, "..");
 
             if (fs.existsSync(file) && (data = parse(fs.readFileSync(file)))) {
                 data.__path = file;
@@ -71,4 +78,4 @@ export default function find(root) {
             return next();
         }
     };
-};
+}

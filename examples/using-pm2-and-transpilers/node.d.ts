@@ -31,11 +31,11 @@ interface WeakSetConstructor { }
 *                   GLOBAL                      *
 *                                               *
 ************************************************/
-declare var process: NodeJS.Process;
-declare var global: NodeJS.Global;
+declare let process: NodeJS.Process;
+declare let global: NodeJS.Global;
 
-declare var __filename: string;
-declare var __dirname: string;
+declare let __filename: string;
+declare let __dirname: string;
 
 declare function setTimeout(callback: (...args: any[]) => void, ms: number, ...args: any[]): NodeJS.Timer;
 declare function clearTimeout(timeoutId: NodeJS.Timer): void;
@@ -55,7 +55,7 @@ interface NodeRequire extends NodeRequireFunction {
     main: any;
 }
 
-declare var require: NodeRequire;
+declare let require: NodeRequire;
 
 interface NodeModule {
     exports: any;
@@ -67,11 +67,11 @@ interface NodeModule {
     children: any[];
 }
 
-declare var module: NodeModule;
+declare let module: NodeModule;
 
 // Same as module.exports
-declare var exports: any;
-declare var SlowBuffer: {
+declare let exports: any;
+declare let SlowBuffer: {
     new (str: string, encoding?: string): Buffer;
     new (size: number): Buffer;
     new (size: Uint8Array): Buffer;
@@ -1792,7 +1792,7 @@ declare module "path" {
      */
     export function format(pathObject: ParsedPath): string;
 
-    export module posix {
+    export namespace posix {
         export function normalize(p: string): string;
         export function join(...paths: any[]): string;
         export function resolve(...pathSegments: any[]): string;
@@ -1807,7 +1807,7 @@ declare module "path" {
         export function format(pP: ParsedPath): string;
     }
 
-    export module win32 {
+    export namespace win32 {
         export function normalize(p: string): string;
         export function join(...paths: any[]): string;
         export function resolve(...pathSegments: any[]): string;
@@ -2086,13 +2086,13 @@ declare module "crypto" {
     export function createHmac(algorithm: string, key: Buffer): Hmac;
     export interface Hash {
         update(data: any, input_encoding?: string): Hash;
-        digest(encoding: 'buffer'): Buffer;
+        digest(encoding: "buffer"): Buffer;
         digest(encoding: string): any;
         digest(): Buffer;
     }
     export interface Hmac extends NodeJS.ReadWriteStream {
         update(data: any, input_encoding?: string): Hmac;
-        digest(encoding: 'buffer'): Buffer;
+        digest(encoding: "buffer"): Buffer;
         digest(encoding: string): any;
         digest(): Buffer;
     }
@@ -2160,8 +2160,8 @@ declare module "crypto" {
         passphrase?: string,
         padding?: any;
     }
-    export function publicEncrypt(public_key: string | RsaPublicKey, buffer: Buffer): Buffer
-    export function privateDecrypt(private_key: string | RsaPrivateKey, buffer: Buffer): Buffer
+    export function publicEncrypt(public_key: string | RsaPublicKey, buffer: Buffer): Buffer;
+    export function privateDecrypt(private_key: string | RsaPrivateKey, buffer: Buffer): Buffer;
 }
 
 declare module "stream" {

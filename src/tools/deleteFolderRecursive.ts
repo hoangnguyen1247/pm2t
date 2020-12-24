@@ -1,6 +1,6 @@
 
-import fs from 'fs';
-import Path from 'path';
+import fs from "fs";
+import Path from "path";
 
 const deleteFolderRecursive = function (path) {
     if (fs.existsSync(path)) {
@@ -16,4 +16,4 @@ const deleteFolderRecursive = function (path) {
     }
 };
 
-export default deleteFolderRecursive
+export default deleteFolderRecursive;

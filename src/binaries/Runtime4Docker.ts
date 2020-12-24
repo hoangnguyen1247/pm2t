@@ -1,55 +1,55 @@
 /**
  * Specialized PM2 CLI for Containers
  */
-import path from 'path';
-import commander from 'commander';
+import path from "path";
+import commander from "commander";
 
-import PM2 from '../API';
-import Log from '../API/Log';
-import cst from '../constants';
-import pkg from '../../package.json';
+import PM2 from "../API";
+import Log from "../API/Log";
+import cst from "../constants";
+import pkg from "../../package.json";
 
 const DEFAULT_FAIL_COUNT = "3";
 
 process.env.PM2_DISCRETE_MODE = "true";
 
 commander.version(pkg.version)
-    .description('pm2-runtime is a drop-in replacement Node.js binary for containers')
-    .option('-i --instances <number>', 'launch [number] of processes automatically load-balanced. Increase overall performances and performance stability.')
-    .option('--secret [key]', '[MONITORING] PM2 plus secret key')
-    .option('--no-autorestart', 'start an app without automatic restart')
-    .option('--node-args <node_args>', 'space delimited arguments to pass to node in cluster mode - e.g. --node-args="--debug=7001 --trace-deprecation"')
-    .option('-n --name <name>', 'set a <name> for script')
-    .option('--max-memory-restart <memory>', 'specify max memory amount used to autorestart (in octet or use syntax like 100M)')
-    .option('-c --cron <cron_pattern>', 'restart a running process based on a cron pattern')
-    .option('--interpreter <interpreter>', 'the interpreter pm2 should use for executing app (bash, python...)')
-    .option('--public [key]', '[MONITORING] PM2 plus public key')
-    .option('--machine-name [name]', '[MONITORING] PM2 plus machine name')
-    .option('--trace', 'enable transaction tracing with km')
-    .option('--v8', 'enable v8 data collecting')
-    .option('--format', 'output logs formated like key=val')
-    .option('--raw', 'raw output (default mode)')
-    .option('--formatted', 'formatted log output |id|app|log')
-    .option('--json', 'output logs in json format')
-    .option('--delay <seconds>', 'delay start of configuration file by <seconds>', "0")
-    .option('--web [port]', 'launch process web api on [port] (default to 9615)')
-    .option('--only <application-name>', 'only act on one application of configuration')
-    .option('--no-auto-exit', 'do not exit if all processes are errored/stopped or 0 apps launched')
-    .option('--env [name]', 'inject env_[name] env variables in process config file')
-    .option('--watch', 'watch and restart application on file change')
-    .option('--error <path>', 'error log file destination (default disabled)', '/dev/null')
-    .option('--output <path>', 'output log file destination (default disabled)', '/dev/null')
-    .option('--deep-monitoring', 'enable all monitoring tools (equivalent to --v8 --event-loop-inspector --trace)')
+    .description("pm2-runtime is a drop-in replacement Node.js binary for containers")
+    .option("-i --instances <number>", "launch [number] of processes automatically load-balanced. Increase overall performances and performance stability.")
+    .option("--secret [key]", "[MONITORING] PM2 plus secret key")
+    .option("--no-autorestart", "start an app without automatic restart")
+    .option("--node-args <node_args>", "space delimited arguments to pass to node in cluster mode - e.g. --node-args=\"--debug=7001 --trace-deprecation\"")
+    .option("-n --name <name>", "set a <name> for script")
+    .option("--max-memory-restart <memory>", "specify max memory amount used to autorestart (in octet or use syntax like 100M)")
+    .option("-c --cron <cron_pattern>", "restart a running process based on a cron pattern")
+    .option("--interpreter <interpreter>", "the interpreter pm2 should use for executing app (bash, python...)")
+    .option("--public [key]", "[MONITORING] PM2 plus public key")
+    .option("--machine-name [name]", "[MONITORING] PM2 plus machine name")
+    .option("--trace", "enable transaction tracing with km")
+    .option("--v8", "enable v8 data collecting")
+    .option("--format", "output logs formated like key=val")
+    .option("--raw", "raw output (default mode)")
+    .option("--formatted", "formatted log output |id|app|log")
+    .option("--json", "output logs in json format")
+    .option("--delay <seconds>", "delay start of configuration file by <seconds>", "0")
+    .option("--web [port]", "launch process web api on [port] (default to 9615)")
+    .option("--only <application-name>", "only act on one application of configuration")
+    .option("--no-auto-exit", "do not exit if all processes are errored/stopped or 0 apps launched")
+    .option("--env [name]", "inject env_[name] env variables in process config file")
+    .option("--watch", "watch and restart application on file change")
+    .option("--error <path>", "error log file destination (default disabled)", "/dev/null")
+    .option("--output <path>", "output log file destination (default disabled)", "/dev/null")
+    .option("--deep-monitoring", "enable all monitoring tools (equivalent to --v8 --event-loop-inspector --trace)")
     .allowUnknownOption()
-    .usage('app.js');
+    .usage("app.js");
 
-commander.command('*')
+commander.command("*")
     .action(function (cmd) {
         Runtime.instanciate(cmd);
     });
 
-commander.command('start <app.js|json_file>')
-    .description('start an application or json ecosystem file')
+commander.command("start <app.js|json_file>")
+    .description("start an application or json ecosystem file")
     .action(function (cmd) {
         Runtime.instanciate(cmd);
     });
@@ -59,11 +59,11 @@ if (process.argv.length == 2) {
     process.exit(1);
 }
 
-var Runtime = {
+const Runtime = {
     pm2: null,
     instanciate: function (cmd) {
         this.pm2 = new PM2({
-            pm2_home: process.env.PM2_HOME || path.join(process.env.HOME, '.pm2'),
+            pm2_home: process.env.PM2_HOME || path.join(process.env.HOME, ".pm2"),
             secret_key: cst.SECRET_KEY || commander.secret,
             public_key: cst.PUBLIC_KEY || commander.public,
             machine_name: cst.MACHINE_NAME || commander.machineName,
@@ -71,11 +71,11 @@ var Runtime = {
         });
 
         this.pm2.connect(function (err, pm2_meta) {
-            process.on('SIGINT', function () {
+            process.on("SIGINT", function () {
                 Runtime.exit();
             });
 
-            process.on('SIGTERM', function () {
+            process.on("SIGTERM", function () {
                 Runtime.exit();
             });
 
@@ -93,12 +93,13 @@ var Runtime = {
      * Log Streaming Management
      */
     startLogStreaming: function () {
-        if (commander.json === true)
-            Log.jsonStream(this.pm2.Client, 'all');
-        else if (commander.format === true)
-            Log.formatStream(this.pm2.Client, 'all', false, 'YYYY-MM-DD-HH:mm:ssZZ');
-        else
-            Log.stream(this.pm2.Client, 'all', !commander.formatted, commander.timestamp, true);
+        if (commander.json === true) {
+            Log.jsonStream(this.pm2.Client, "all");
+        } else if (commander.format === true) {
+            Log.formatStream(this.pm2.Client, "all", false, "YYYY-MM-DD-HH:mm:ssZZ");
+        } else {
+            Log.stream(this.pm2.Client, "all", !commander.formatted, commander.timestamp, true);
+        }
     },
 
     /**
@@ -107,13 +108,15 @@ var Runtime = {
     startApp: function (cmd, cb) {
         function exec() {
             this.pm2.start(cmd, commander, function (err, obj) {
-                if (err)
+                if (err) {
                     return cb(err);
-                if (obj && obj.length == 0)
-                    return cb(new Error(`0 application started (no apps to run on ${cmd})`))
+                }
+                if (obj && obj.length == 0) {
+                    return cb(new Error(`0 application started (no apps to run on ${cmd})`));
+                }
 
                 if (commander.web) {
-                    var port = commander.web === true ? cst.WEB_PORT : commander.web;
+                    const port = commander.web === true ? cst.WEB_PORT : commander.web;
                     Runtime.pm2.web(port);
                 }
 
@@ -124,8 +127,11 @@ var Runtime = {
                 }
 
                 // For Testing purpose (allow to auto exit CLI)
-                if (process.env.PM2_RUNTIME_DEBUG)
-                    Runtime.pm2.disconnect(function () { });
+                if (process.env.PM2_RUNTIME_DEBUG) {
+                    Runtime.pm2.disconnect(function () { 
+                        // do nothing
+                    });
+                }
 
                 return cb(null, obj);
             });
@@ -138,7 +144,9 @@ var Runtime = {
      * Exit runtime mgmt
      */
     exit: function (code?) {
-        if (!this.pm2) return process.exit(1);
+        if (!this.pm2) {
+            return process.exit(1);
+        }
 
         this.pm2.kill(function () {
             process.exit(code || 0);
@@ -150,19 +158,20 @@ var Runtime = {
      * function activated via --auto-exit
      */
     autoExitWorker: function (fail_count?) {
-        var interval = 2000;
+        const interval = 2000;
 
-        if (typeof (fail_count) == 'undefined')
+        if (typeof (fail_count) == "undefined") {
             fail_count = DEFAULT_FAIL_COUNT;
+        }
 
-        var timer = setTimeout(function () {
+        const timer = setTimeout(function () {
             Runtime.pm2.list(function (err, apps) {
                 if (err) {
-                    console.error('Could not run pm2 list');
+                    console.error("Could not run pm2 list");
                     return Runtime.autoExitWorker();
                 }
 
-                var appOnline = 0;
+                let appOnline = 0;
 
                 apps.forEach(function (app) {
                     if (!app.pm2_env.pmx_module &&
@@ -173,9 +182,10 @@ var Runtime = {
                 });
 
                 if (appOnline === 0) {
-                    console.log('0 application online, retry =', fail_count);
-                    if (fail_count <= 0)
+                    console.log("0 application online, retry =", fail_count);
+                    if (fail_count <= 0) {
                         return Runtime.exit(2);
+                    }
                     return Runtime.autoExitWorker(--fail_count);
                 }
 
@@ -185,6 +195,6 @@ var Runtime = {
 
         timer.unref();
     }
-}
+};
 
 commander.parse(process.argv);

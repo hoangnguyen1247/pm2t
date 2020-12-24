@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 /*
   options: {
@@ -10,41 +10,44 @@ import path from 'path';
   }
 */
 function copydirSync(from, to, options?) {
-    if (typeof options === 'function') {
+    if (typeof options === "function") {
         options = {
             filter: options
         };
     }
-    if (typeof options === 'undefined') options = {};
-    if (typeof options.cover === 'undefined') {
+    if (typeof options === "undefined") {
+        options = {};
+    }
+    if (typeof options.cover === "undefined") {
         options.cover = true;
     }
-    options.filter = typeof options.filter === 'function' ? options.filter : function (state, filepath, filename) {
+    options.filter = typeof options.filter === "function" ? options.filter : function (state, filepath, filename) {
         return options.filter;
     };
-    var stats = fs.lstatSync(from);
-    var statsname = stats.isDirectory() ? 'directory' :
-        stats.isFile() ? 'file' :
-            stats.isSymbolicLink() ? 'symbolicLink' :
-                '';
-    var valid = options.filter(statsname, from, path.dirname(from), path.basename(from));
+    const stats = fs.lstatSync(from);
+    const statsname = stats.isDirectory() ? "directory" :
+        stats.isFile() ? "file" :
+            stats.isSymbolicLink() ? "symbolicLink" :
+                "";
+    const valid = options.filter(statsname, from, path.dirname(from), path.basename(from));
 
-    if (statsname === 'directory' || statsname === 'symbolicLink') {
+    if (statsname === "directory" || statsname === "symbolicLink") {
         // Directory or SymbolicLink
         if (valid) {
             try {
                 fs.statSync(to);
             } catch (err) {
-                if (err.code === 'ENOENT') {
+                if (err.code === "ENOENT") {
                     fs.mkdirSync(to);
-                    options.debug && console.log('>> ' + to);
+                    options.debug && console.log(">> " + to);
                 } else {
                     throw err;
                 }
             }
             rewriteSync(to, options, stats);
-            if (statsname != 'symbolicLink')
+            if (statsname != "symbolicLink") {
                 listDirectorySync(from, to, options);
+            }
         }
     } else if (stats.isFile()) {
         // File
@@ -55,7 +58,7 @@ function copydirSync(from, to, options?) {
                 try {
                     fs.statSync(to);
                 } catch (err) {
-                    if (err.code === 'ENOENT') {
+                    if (err.code === "ENOENT") {
                         writeFileSync(from, to, options, stats);
                     } else {
                         throw err;
@@ -64,32 +67,34 @@ function copydirSync(from, to, options?) {
             }
         }
     } else {
-        throw new Error('stats invalid: ' + from);
+        throw new Error("stats invalid: " + from);
     }
-};
+}
 
 function listDirectorySync(from, to, options) {
-    var files = fs.readdirSync(from);
+    const files = fs.readdirSync(from);
     copyFromArraySync(files, from, to, options);
 }
 
 function copyFromArraySync(files, from, to, options) {
-    if (files.length === 0) return true;
-    var f = files.shift();
+    if (files.length === 0) {
+        return true;
+    }
+    const f = files.shift();
     copydirSync(path.join(from, f), path.join(to, f), options);
     copyFromArraySync(files, from, to, options);
 }
 
 function writeFileSync(from, to, options, stats) {
-    fs.writeFileSync(to, fs.readFileSync(from, 'binary'), 'binary');
-    options.debug && console.log('>> ' + to);
+    fs.writeFileSync(to, fs.readFileSync(from, "binary"), "binary");
+    options.debug && console.log(">> " + to);
     rewriteSync(to, options, stats);
 }
 
 function rewriteSync(f, options, stats, callback?) {
     if (options.cover) {
-        var mode = options.mode === true ? stats.mode : options.mode;
-        var utimes = options.utimes === true ? {
+        const mode = options.mode === true ? stats.mode : options.mode;
+        const utimes = options.utimes === true ? {
             atime: stats.atime,
             mtime: stats.mtime
         } : options.utimes;

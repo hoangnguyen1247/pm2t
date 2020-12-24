@@ -25,6 +25,12 @@ module.exports = {
         "no-prototype-builtins": 0,
         "object-curly-spacing": [ 2, "always" ],
         "eol-last": [ 2, "always" ],
+        "curly": [2, "all"],
+        "brace-style": [ 2, "1tbs" ],
+        "no-empty": 0,
+        "no-empty-function": [ 2, { "allow": [ "arrowFunctions" ] }],
         "no-console": 0,
+        "no-control-regex": 0,
+        "no-useless-escape": 0,
     }
 }

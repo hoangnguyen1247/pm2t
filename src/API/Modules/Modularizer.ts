@@ -3,45 +3,45 @@
  * Use of this source code is governed by a license that
  * can be found in the LICENSE file.
  */
-import eachLimit from 'async/eachLimit';
-import forEachLimit from 'async/forEachLimit';
+import eachLimit from "async/eachLimit";
+import forEachLimit from "async/forEachLimit";
 
-import Configuration from '../../Configuration';
-import cst from '../../constants';
-import Common from '../../Common';
-import NPM from './NPM';
-import TAR from './TAR';
-import LOCAL from './LOCAL';
+import Configuration from "../../Configuration";
+import cst from "../../constants";
+import Common from "../../Common";
+import NPM from "./NPM";
+import TAR from "./TAR";
+import LOCAL from "./LOCAL";
 
-var Modularizer: any = {};
+const Modularizer: any = {};
 
 /**
  * PM2 Module System.
  */
 Modularizer.install = function (CLI, module_name, opts, cb) {
     module_name = module_name.replace(/[;`|]/g, "");
-    if (typeof (opts) == 'function') {
+    if (typeof (opts) == "function") {
         cb = opts;
         opts = {};
     }
 
     if (LOCAL.INTERNAL_MODULES.hasOwnProperty(module_name)) {
         Common.logMod(`Adding dependency ${module_name} to PM2 Runtime`);
-        var currentModule = LOCAL.INTERNAL_MODULES[module_name];
-        if (currentModule && currentModule.hasOwnProperty('dependencies')) {
+        const currentModule = LOCAL.INTERNAL_MODULES[module_name];
+        if (currentModule && currentModule.hasOwnProperty("dependencies")) {
             LOCAL.installMultipleModules(currentModule.dependencies, cb);
         } else {
             LOCAL.install(currentModule, cb);
         }
-    } else if (module_name == '.') {
-        Common.logMod(`Installing local NPM module`);
-        return NPM.localStart(CLI, opts, cb)
+    } else if (module_name == ".") {
+        Common.logMod("Installing local NPM module");
+        return NPM.localStart(CLI, opts, cb);
     } else if (opts.tarball || /\.tar\.gz$/i.test(module_name)) {
-        Common.logMod(`Installing TAR module`);
-        TAR.install(CLI, module_name, opts, cb)
+        Common.logMod("Installing TAR module");
+        TAR.install(CLI, module_name, opts, cb);
     } else {
         Common.logMod(`Installing NPM ${module_name} module`);
-        NPM.install(CLI, module_name, opts, cb)
+        NPM.install(CLI, module_name, opts, cb);
     }
 };
 
@@ -50,69 +50,77 @@ Modularizer.install = function (CLI, module_name, opts, cb) {
  * Used PM2 at startup
  */
 Modularizer.launchModules = function (CLI, cb) {
-    var modules = Modularizer.listModules();
+    const modules = Modularizer.listModules();
 
-    if (!modules) return cb();
+    if (!modules) {
+        return cb();
+    }
 
     // 1#
     function launchNPMModules(cb) {
-        if (!modules.npm_modules) return launchTARModules(cb)
+        if (!modules.npm_modules) {
+            return launchTARModules(cb);
+        }
 
         eachLimit(Object.keys(modules.npm_modules), 1, function (module_name, next) {
-            NPM.start(CLI, modules, module_name, next)
+            NPM.start(CLI, modules, module_name, next);
         }, function () {
-            launchTARModules(cb)
+            launchTARModules(cb);
         });
     }
 
     // 2#
     function launchTARModules(cb) {
-        if (!modules.tar_modules) return cb()
+        if (!modules.tar_modules) {
+            return cb();
+        }
 
         eachLimit(Object.keys(modules.tar_modules), 1, function (module_name, next) {
-            TAR.start(CLI, module_name, next)
+            TAR.start(CLI, module_name, next);
         }, function () {
             return cb ? cb(null) : false;
         });
     }
 
-    launchNPMModules(cb)
-}
+    launchNPMModules(cb);
+};
 
 Modularizer.package = function (CLI, module_path, cb) {
-    var fullpath = process.cwd()
-    if (module_path)
-        fullpath = require('path').resolve(module_path)
-    TAR.package1(fullpath, process.cwd(), cb)
-}
+    let fullpath = process.cwd();
+    if (module_path) {
+        fullpath = require("path").resolve(module_path);
+    }
+    TAR.package1(fullpath, process.cwd(), cb);
+};
 
 /**
  * Uninstall module
  */
 Modularizer.uninstall = function (CLI, module_name, cb) {
-    Common.printOut(cst.PREFIX_MSG_MOD + 'Uninstalling module ' + module_name);
-    var modules_list = Modularizer.listModules();
+    Common.printOut(cst.PREFIX_MSG_MOD + "Uninstalling module " + module_name);
+    const modules_list = Modularizer.listModules();
 
-    if (module_name == 'all') {
-        if (!modules_list) return cb();
+    if (module_name == "all") {
+        if (!modules_list) {
+            return cb();
+        }
 
         return forEachLimit(Object.keys(modules_list.npm_modules), 1, function (module_name, next) {
-            NPM.uninstall(CLI, module_name, next)
+            NPM.uninstall(CLI, module_name, next);
         }, () => {
             forEachLimit(Object.keys(modules_list.tar_modules), 1, function (module_name, next) {
-                TAR.uninstall(CLI, module_name, next)
-            }, cb)
+                TAR.uninstall(CLI, module_name, next);
+            }, cb);
         });
     }
 
     if (modules_list.npm_modules[module_name]) {
-        NPM.uninstall(CLI, module_name, cb)
+        NPM.uninstall(CLI, module_name, cb);
     } else if (modules_list.tar_modules[module_name]) {
-        TAR.uninstall(CLI, module_name, cb)
-    }
-    else {
-        Common.errMod('Unknown module')
-        CLI.exitCli(1)
+        TAR.uninstall(CLI, module_name, cb);
+    } else {
+        Common.errMod("Unknown module");
+        CLI.exitCli(1);
     }
 };
 
@@ -123,24 +131,23 @@ Modularizer.listModules = function () {
     return {
         npm_modules: Configuration.getSync(cst.MODULE_CONF_PREFIX) || {},
         tar_modules: Configuration.getSync(cst.MODULE_CONF_PREFIX_TAR) || {}
-    }
+    };
 };
 
 Modularizer.getAdditionalConf = function (app_name) {
-    return NPM.getModuleConf(app_name)
+    return NPM.getModuleConf(app_name);
 };
 
 Modularizer.publish = function (PM2, folder, opts, cb) {
     if (opts.npm == true) {
-        NPM.publish(opts, cb)
-    }
-    else {
-        TAR.publish(PM2, folder, cb)
+        NPM.publish(opts, cb);
+    } else {
+        TAR.publish(PM2, folder, cb);
     }
 };
 
 Modularizer.generateSample = function (app_name, cb) {
-    NPM.generateSample(app_name, cb)
+    NPM.generateSample(app_name, cb);
 };
 
 export default Modularizer;

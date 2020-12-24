@@ -1,14 +1,15 @@
+import { AnyObject } from "TypeUtils";
+
 export {};
 
 declare global {
+    interface Object {
+        size(o: AnyObject): number;
+    }
 
-  interface Object {
-    size(o: Object): number;
-  }
+    interface define {
+        [key: string]: any
+    }
 
-  interface define {
-    [key: string]: any
-  }
-
-  function define(val: any): void;
+    function define(val: any): void;
 }

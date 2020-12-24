@@ -9,13 +9,13 @@
 //
 // --------------------------------------------------------------------------------------------------------------------
 
-import util from 'util';
+import util from "util";
 
 // --------------------------------------------------------------------------------------------------------------------
 
-var sepC = '===============================================================================';
-var lineC = '-------------------------------------------------------------------------------';
-var fieldC = '                    ';
+const sepC = "===============================================================================";
+const lineC = "-------------------------------------------------------------------------------";
+const fieldC = "                    ";
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,32 +34,31 @@ export const line = function () {
 
 // title
 export const title = function (title) {
-    var out = '--- ' + title + ' ';
+    let out = "--- " + title + " ";
     out += lineC.substr(out.length);
     console.log(out);
 };
 
 // field
 export const field = function (key, value) {
-    console.log('' + key + fieldC.substr(key.length) + ' : ' + value);
+    console.log("" + key + fieldC.substr(key.length) + " : " + value);
 };
 
 // subfield
 export const subfield = function (key, value) {
-    console.log('- ' + key + fieldC.substr(key.length + 2) + ' : ' + value);
+    console.log("- " + key + fieldC.substr(key.length + 2) + " : " + value);
 };
 
 // list item
 export const li = function (msg) {
-    console.log('* ' + msg);
+    console.log("* " + msg);
 };
 
 // dump
 export const dump = function (data, name) {
     if (name) {
-        console.log(name + ' :', util.inspect(data, false, null, true));
-    }
-    else {
+        console.log(name + " :", util.inspect(data, false, null, true));
+    } else {
         console.log(util.inspect(data, false, null, true));
     }
 };

@@ -5,9 +5,9 @@
 // do the universal module definition dance
 export default (function (root, factory) {
 
-    if (typeof exports === 'object') {
+    if (typeof exports === "object") {
         module.exports = factory();
-    } else if (typeof global.define === 'function' && global.define["amd"]) {
+    } else if (typeof global.define === "function" && global.define["amd"]) {
         global.define(factory);
     } else {
         (root as any).treeify = factory();
@@ -16,18 +16,18 @@ export default (function (root, factory) {
 }(this, function () {
 
     function makePrefix(key, last) {
-        var str = (last ? '└' : '├');
+        let str = (last ? "└" : "├");
         if (key) {
-            str += '─ ';
+            str += "─ ";
         } else {
-            str += '──┐';
+            str += "──┐";
         }
         return str;
     }
 
     function filterKeys(obj, hideFunctions) {
-        var keys = [];
-        for (var branch in obj) {
+        const keys = [];
+        for (const branch in obj) {
             // always exclude anything in the object's prototype
             if (!obj.hasOwnProperty(branch)) {
                 continue;
@@ -42,14 +42,15 @@ export default (function (root, factory) {
     }
 
     function growBranch(key, root, last, lastStates, showValues, hideFunctions, callback) {
-        var line = '', index = 0, lastKey, circular, lastStatesCopy = lastStates.slice(0);
+        let line = "", index = 0, lastKey, circular;
+        const lastStatesCopy = lastStates.slice(0);
 
         if (lastStatesCopy.push([root, last]) && lastStates.length > 0) {
             // based on the "was last element" states of whatever we're nested within,
             // we need to append either blankness or a branch to our line
             lastStates.forEach(function (lastState, idx) {
                 if (idx > 0) {
-                    line += (lastState[1] ? ' ' : '│') + '  ';
+                    line += (lastState[1] ? " " : "│") + "  ";
                 }
                 if (!circular && lastState[0] === root) {
                     circular = true;
@@ -61,15 +62,15 @@ export default (function (root, factory) {
             line += makePrefix(key, last) + key;
 
             // append values and the circular reference indicator
-            showValues && (typeof root !== 'object' || root instanceof Date) && (line += ': ' + root);
-            circular && (line += ' (circular ref.)');
+            showValues && (typeof root !== "object" || root instanceof Date) && (line += ": " + root);
+            circular && (line += " (circular ref.)");
 
             callback(line);
         }
 
         // can we descend into the next item?
-        if (!circular && typeof root === 'object') {
-            var keys = filterKeys(root, hideFunctions);
+        if (!circular && typeof root === "object") {
+            const keys = filterKeys(root, hideFunctions);
             keys.forEach(function (branch) {
                 // the last key is always printed with a different prefix, so we'll need to know if we have it
                 lastKey = ++index === keys.length;
@@ -78,11 +79,11 @@ export default (function (root, factory) {
                 growBranch(branch, root[branch], lastKey, lastStatesCopy, showValues, hideFunctions, callback);
             });
         }
-    };
+    }
 
     // --------------------
 
-    var Treeify: any = {};
+    const Treeify: any = {};
 
     // Treeify.asLines
     // --------------------
@@ -90,8 +91,8 @@ export default (function (root, factory) {
 
     Treeify.asLines = function (obj, showValues, hideFunctions, lineCallback) {
         /* hideFunctions and lineCallback are curried, which means we don't break apps using the older form */
-        var hideFunctionsArg = typeof hideFunctions !== 'function' ? hideFunctions : false;
-        growBranch('.', obj, false, [], showValues, hideFunctionsArg, lineCallback || hideFunctions);
+        const hideFunctionsArg = typeof hideFunctions !== "function" ? hideFunctions : false;
+        growBranch(".", obj, false, [], showValues, hideFunctionsArg, lineCallback || hideFunctions);
     };
 
     // Treeify.asTree
@@ -99,9 +100,9 @@ export default (function (root, factory) {
     // Outputs the entire tree, returning it as a string with line breaks.
 
     Treeify.asTree = function (obj, showValues, hideFunctions) {
-        var tree = '';
-        growBranch('.', obj, false, [], showValues, hideFunctions, function (line) {
-            tree += line + '\n';
+        let tree = "";
+        growBranch(".", obj, false, [], showValues, hideFunctions, function (line) {
+            tree += line + "\n";
         });
         return tree;
     };

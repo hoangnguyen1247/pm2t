@@ -1,17 +1,17 @@
 
-import fs from 'fs';
-import path from 'path';
-import cst from '../constants'
+import fs from "fs";
+import path from "path";
+import cst from "../constants";
 
 // XP's system default value for `PATHEXT` system variable, just in case it's not
 // set on Windows.
-var XP_DEFAULT_PATHEXT = '.com;.exe;.bat;.cmd;.vbs;.vbe;.js;.jse;.wsf;.wsh';
+const XP_DEFAULT_PATHEXT = ".com;.exe;.bat;.cmd;.vbs;.vbe;.js;.jse;.wsf;.wsh";
 
 // For earlier versions of NodeJS that doesn't have a list of constants (< v6)
-var FILE_EXECUTABLE_MODE = 1;
+const FILE_EXECUTABLE_MODE = 1;
 
-function statFollowLinks(pathName) {
-    return fs.statSync.apply(fs, arguments as any);
+function statFollowLinks(...args) {
+    return fs.statSync(args as any);
 }
 
 function isWindowsPlatform() {
@@ -54,39 +54,43 @@ function checkPath(pathName) {
 //@ Returns a [ShellString](#shellstringstr) containing the absolute path to
 //@ `command`.
 function _which(cmd) {
-    if (!cmd) console.error('must specify command');
+    if (!cmd) {
+        console.error("must specify command");
+    }
 
-    var options: any = {}
+    const options: any = {};
 
-    var isWindows = isWindowsPlatform();
-    var pathArray = splitPath(process.env.PATH);
+    const isWindows = isWindowsPlatform();
+    const pathArray = splitPath(process.env.PATH);
 
-    var queryMatches = [];
+    const queryMatches = [];
 
     // No relative/absolute paths provided?
-    if (cmd.indexOf('/') === -1) {
+    if (cmd.indexOf("/") === -1) {
         // Assume that there are no extensions to append to queries (this is the
         // case for unix)
-        var pathExtArray = [''];
+        let pathExtArray = [""];
         if (isWindows) {
             // In case the PATHEXT variable is somehow not set (e.g.
             // child_process.spawn with an empty environment), use the XP default.
-            var pathExtEnv = process.env.PATHEXT || XP_DEFAULT_PATHEXT;
+            const pathExtEnv = process.env.PATHEXT || XP_DEFAULT_PATHEXT;
             pathExtArray = splitPath(pathExtEnv.toUpperCase());
         }
 
         // Search for command in PATH
-        for (var k = 0; k < pathArray.length; k++) {
+        for (let k = 0; k < pathArray.length; k++) {
             // already found it
-            if (queryMatches.length > 0 && !options.all) break;
+            if (queryMatches.length > 0 && !options.all) {
+                break;
+            }
 
-            var attempt = path.resolve(pathArray[k], cmd);
+            let attempt = path.resolve(pathArray[k], cmd);
 
             if (isWindows) {
                 attempt = attempt.toUpperCase();
             }
 
-            var match = attempt.match(/\.[^<>:"/|?*.]+$/);
+            const match = attempt.match(/\.[^<>:"/|?*.]+$/);
             if (match && pathExtArray.indexOf(match[0]) >= 0) { // this is Windows-only
                 // The user typed a query with the file extension, like
                 // `which('node.exe')`
@@ -97,9 +101,9 @@ function _which(cmd) {
             } else { // All-platforms
                 // Cycle through the PATHEXT array, and check each extension
                 // Note: the array is always [''] on Unix
-                for (var i = 0; i < pathExtArray.length; i++) {
-                    var ext = pathExtArray[i];
-                    var newAttempt = attempt + ext;
+                for (let i = 0; i < pathExtArray.length; i++) {
+                    const ext = pathExtArray[i];
+                    const newAttempt = attempt + ext;
                     if (checkPath(newAttempt)) {
                         queryMatches.push(newAttempt);
                         break;

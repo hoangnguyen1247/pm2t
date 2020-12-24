@@ -1,24 +1,24 @@
-'use strict';
+"use strict";
 
 // From https://raw.githubusercontent.com/pkrumins/node-tree-kill/master/index.js
 
-import childProcess from 'child_process';
-var spawn = childProcess.spawn;
-var exec = childProcess.exec;
+import childProcess from "child_process";
+const spawn = childProcess.spawn;
+const exec = childProcess.exec;
 
 export default function (pid, signal, callback) {
-    var tree = {};
-    var pidsToProcess = {};
+    const tree = {};
+    const pidsToProcess = {};
     tree[pid] = [];
     pidsToProcess[pid] = 1;
 
     switch (process.platform) {
-        case 'win32':
-            exec('taskkill /pid ' + pid + ' /T /F', { windowsHide: true }, callback);
+        case "win32":
+            exec("taskkill /pid " + pid + " /T /F", { windowsHide: true }, callback);
             break;
-        case 'darwin':
+        case "darwin":
             buildProcessTree(pid, tree, pidsToProcess, function (parentPid) {
-                return spawn('pgrep', ['-P', parentPid]);
+                return spawn("pgrep", ["-P", parentPid]);
             }, function () {
                 killAll(tree, signal, callback);
             });
@@ -30,16 +30,16 @@ export default function (pid, signal, callback) {
         //     break;
         default: // Linux
             buildProcessTree(pid, tree, pidsToProcess, function (parentPid) {
-                return spawn('ps', ['-o', 'pid', '--no-headers', '--ppid', parentPid]);
+                return spawn("ps", ["-o", "pid", "--no-headers", "--ppid", parentPid]);
             }, function () {
                 killAll(tree, signal, callback);
             });
             break;
     }
-};
+}
 
 function killAll(tree, signal, callback) {
-    var killed = {};
+    const killed = {};
     try {
         Object.keys(tree).forEach(function (pid) {
             tree[pid].forEach(function (pidpid) {
@@ -68,29 +68,29 @@ function killAll(tree, signal, callback) {
 function killPid(pid, signal) {
     try {
         process.kill(parseInt(pid, 10), signal);
-    }
-    catch (err) {
-        if (err.code !== 'ESRCH')
+    } catch (err) {
+        if (err.code !== "ESRCH") {
             console.error(err);
+        }
     }
 }
 
 function buildProcessTree(parentPid, tree, pidsToProcess, spawnChildProcessesList, cb) {
-    var ps = spawnChildProcessesList(parentPid);
-    var allData = '';
+    const ps = spawnChildProcessesList(parentPid);
+    let allData = "";
 
-    ps.on('error', function (err) {
+    ps.on("error", function (err) {
         console.error(err);
     });
 
     if (ps.stdout) {
-        ps.stdout.on('data', function (data) {
-            data = data.toString('ascii');
+        ps.stdout.on("data", function (data) {
+            data = data.toString("ascii");
             allData += data;
         });
     }
 
-    var onClose = function (code) {
+    const onClose = function (code) {
         delete pidsToProcess[parentPid];
 
         if (code !== 0) {
@@ -100,9 +100,10 @@ function buildProcessTree(parentPid, tree, pidsToProcess, spawnChildProcessesLis
             }
             return;
         }
-        var pids = allData.match(/\d+/g) || [];
-        if (pids.length === 0)
+        const pids = allData.match(/\d+/g) || [];
+        if (pids.length === 0) {
             return cb();
+        }
 
         pids.forEach(function (pid) {
             pid = parseInt(pid, 10) + "";
@@ -113,5 +114,5 @@ function buildProcessTree(parentPid, tree, pidsToProcess, spawnChildProcessesLis
         });
     };
 
-    ps.on('close', onClose);
+    ps.on("close", onClose);
 }
