@@ -1,6 +1,8 @@
 <div align="center">
-A Typescript version of PM2 4.5.0  <b>P</b>(rocess) <b>M</b>(anager) <b>2</b><br/>
-  <i>Runtime Edition</i><br/>
+A Typescript version of PM2 4.5.0
+<br/><b>P</b>(rocess) <b>M</b>(anager) <b>2</b><br/>
+  <i>Runtime Edition</i>
+<br/>
   <b>Don't use for your production app. Use PM2 instead</b>
 <br/><br/>
 
