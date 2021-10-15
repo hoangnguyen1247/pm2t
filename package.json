@@ -17,82 +17,11 @@
     },
     "maintainers": [
         {
-            "name": "Alexandre Strzelewicz",
-            "email": "alexandre@pm2.io"
-        },
-        {
-            "name": "Antoine Bluchet",
-            "email": "antoine@pm2.io"
+            "name": "Hoàng Ng.",
+            "email": "hoang.nguyen1247@gmail.com"
         }
     ],
     "contributors": [
-        {
-            "name": "Alex Kocharin",
-            "email": "alex@kocharin.ru"
-        },
-        {
-            "name": "Antoine Bluchet",
-            "email": "soyuka@gmail.com"
-        },
-        {
-            "name": "Subhash Burramsetty"
-        },
-        {
-            "name": "Valentin Marchaud",
-            "email": "thisismac47@gmail.com"
-        },
-        {
-            "name": "Valentin Touffet",
-            "email": "contact@eywek.fr"
-        },
-        {
-            "name": "Florian Hermouet-Joscht",
-            "email": "florian@keymetrics.io"
-        },
-        {
-            "name": "Vincent Vallet",
-            "email": "wallet77@gmail.com"
-        },
-        {
-            "name": "Joni Shkurti",
-            "email": "jonishkurti90@gmail.com"
-        },
-        {
-            "name": "Jun Tjatse",
-            "email": "thisnamemeansnothing@gmail.com"
-        },
-        {
-            "name": "Xu Jingxin",
-            "email": "sailxjx@gmail.com"
-        },
-        {
-            "name": "Ben Postlethwaite",
-            "email": "post.ben.here@gmail.com"
-        },
-        {
-            "name": "Devo.ps",
-            "email": "contact@devo.ps"
-        },
-        {
-            "name": "Bret Copeland",
-            "email": "bret@atlantisflight.org"
-        },
-        {
-            "name": "John Hurliman",
-            "email": "jhurliman@jhurliman.org"
-        },
-        {
-            "name": "TruongSinh Tran-Nguyen",
-            "email": "i@truongsinh.pro"
-        },
-        {
-            "name": "Michael Hueuberger",
-            "email": "michael.heuberger@binarykitchen.com"
-        },
-        {
-            "name": "Chris Wiggins",
-            "email": "chris@chriswiggins.co.nz"
-        }
     ],
     "homepage": "https://github.com/hoangnguyen1247/pm2t",
     "description": "Production process manager for Node.JS applications with a built-in load balancer.",
@@ -115,62 +44,7 @@
         "test": "bash test/unit.sh && bash test/e2e.sh"
     },
     "keywords": [
-        "cli",
-        "fault tolerant",
-        "sysadmin",
-        "tools",
-        "pm2",
-        "logs",
-        "log",
-        "json",
-        "express",
-        "hapi",
-        "kraken",
-        "reload",
-        "load balancer",
-        "lb",
-        "load-balancer",
-        "kubernetes",
-        "k8s",
-        "pm2-docker",
-        "runtime",
-        "source maps",
-        "graceful",
-        "microservice",
-        "programmatic",
-        "harmony",
-        "node-pm2",
-        "production",
-        "keymetrics",
-        "node.js monitoring",
-        "strong-pm",
-        "deploy",
-        "deployment",
-        "daemon",
-        "supervisor",
-        "supervisord",
-        "nodemon",
-        "pm2.io",
-        "ghost",
-        "ghost production",
-        "monitoring",
-        "keymetrics",
-        "process manager",
-        "forever",
-        "profiling",
-        "probes",
-        "apm",
-        "container",
-        "forever-monitor",
-        "keep process alive",
-        "process configuration",
-        "clustering",
-        "cluster cli",
-        "cluster",
-        "docker",
-        "cron",
-        "devops",
-        "dev ops"
+        "pm2t"
     ],
     "bin": {
         "pm2t": "./bin/pm2t",
@@ -244,5 +118,5 @@
         "type": "git",
         "url": "git+https://github.com/hoangnguyen1247/pm2t.git"
     },
-    "license": "AGPL-3.0"
+    "license": "MIT"
 }
