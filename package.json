@@ -1,7 +1,7 @@
 {
     "name": "pm2t",
     "preferGlobal": true,
-    "version": "4.5.15",
+    "version": "4.5.16",
     "engines": {
         "node": ">=8.10.0"
     },
@@ -21,8 +21,7 @@
             "email": "hoang.nguyen1247@gmail.com"
         }
     ],
-    "contributors": [
-    ],
+    "contributors": [],
     "homepage": "https://github.com/hoangnguyen1247/pm2t",
     "description": "Production process manager for Node.JS applications with a built-in load balancer.",
     "main": "index.js",
