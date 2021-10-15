@@ -35,8 +35,8 @@ describe("Flag -ext", function() {
         fs.chmodSync("noAccessDir", 0000);
         f_e.make_available_extension(opts, []);
         f_e.make_available_extension(opts, []);
-        fs.chmodSync("noAccessDir", 0777);
-        fs.chmodSync("noAccessDir/checkPermissions.txt", 0777);
+        fs.chmodSync("noAccessDir", 0o777);
+        fs.chmodSync("noAccessDir/checkPermissions.txt", 0o777);
         fs.unlinkSync("noAccessDir/checkPermissions.txt");
         fs.rmdirSync("noAccessDir/");
     });
