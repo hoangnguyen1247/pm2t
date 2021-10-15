@@ -1,7 +1,7 @@
 {
     "name": "pm2t",
     "preferGlobal": true,
-    "version": "1.0.0",
+    "version": "4.5.12",
     "engines": {
         "node": ">=8.10.0"
     },
