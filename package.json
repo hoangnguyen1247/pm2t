@@ -94,7 +94,7 @@
             "email": "chris@chriswiggins.co.nz"
         }
     ],
-    "homepage": "http://pm2.keymetrics.io/",
+    "homepage": "https://github.com/hoangnguyen1247/pm2t",
     "description": "Production process manager for Node.JS applications with a built-in load balancer.",
     "main": "index.js",
     "types": "types/index.d.ts",
