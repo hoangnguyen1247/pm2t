@@ -67,7 +67,7 @@ delete process.env.pm2_env;
 
     try {
         fs.writeFileSync(pidFile, process.pid.toString());
-    } catch (e) {
+    } catch (e: any) {
         console.error(e.stack || e);
     }
 
@@ -92,7 +92,7 @@ delete process.env.pm2_env;
             if (process.env.gid) {
                 process.setgid(pm2_env.gid);
             }
-        } catch (e) {
+        } catch (e: any) {
             setTimeout(function () {
                 console.error("%s on call %s", e.message, e.syscall);
                 console.error("%s is not accessible", pm2_env.uid);
@@ -115,7 +115,7 @@ function exec(script, stds) {
     if (p.extname(script) == ".coffee") {
         try {
             require("coffee-script/register");
-        } catch (e) {
+        } catch (e: any) {
             console.error("Failed to load CoffeeScript interpreter:", e.message || e);
         }
     }
@@ -123,7 +123,7 @@ function exec(script, stds) {
     if (p.extname(script) == ".ls") {
         try {
             require("livescript");
-        } catch (e) {
+        } catch (e: any) {
             console.error("Failed to load LiveScript interpreter:", e.message || e);
         }
     }
@@ -131,7 +131,7 @@ function exec(script, stds) {
     if (p.extname(script) == ".ts" || p.extname(script) == ".tsx") {
         try {
             require("ts-node/register");
-        } catch (e) {
+        } catch (e: any) {
             console.error("Failed to load Typescript interpreter:", e.message || e);
         }
     }
@@ -291,7 +291,7 @@ function exec(script, stds) {
                         type: "process:exception",
                         data: errObj !== undefined ? errObj : { message: "No error but " + listener + " was caught!" }
                     });
-                } catch (e) {
+                } catch (e: any) {
                     logError(["std", "err"], "Channel is already closed can't broadcast error:\n" + e.stack);
                 }
 
@@ -319,7 +319,7 @@ function exec(script, stds) {
                 types.forEach(function (type) {
                     stds[type] && typeof stds[type].write == "function" && stds[type].write(error + "\n");
                 });
-            } catch (e) { 
+            } catch (e) {
                 // do nothing
             }
         }

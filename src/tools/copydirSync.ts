@@ -36,7 +36,7 @@ function copydirSync(from, to, options?) {
         if (valid) {
             try {
                 fs.statSync(to);
-            } catch (err) {
+            } catch (err: any) {
                 if (err.code === "ENOENT") {
                     fs.mkdirSync(to);
                     options.debug && console.log(">> " + to);
@@ -57,7 +57,7 @@ function copydirSync(from, to, options?) {
             } else {
                 try {
                     fs.statSync(to);
-                } catch (err) {
+                } catch (err: any) {
                     if (err.code === "ENOENT") {
                         writeFileSync(from, to, options, stats);
                     } else {

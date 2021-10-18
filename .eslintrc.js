@@ -33,5 +33,6 @@ module.exports = {
         "no-control-regex": 0,
         "no-useless-escape": 0,
         "no-octal": 0,
+        "@typescript-eslint/ban-ts-comment": 1
     }
 };

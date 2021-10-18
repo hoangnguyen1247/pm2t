@@ -68,7 +68,7 @@ function killAll(tree, signal, callback) {
 function killPid(pid, signal) {
     try {
         process.kill(parseInt(pid, 10), signal);
-    } catch (err) {
+    } catch (err: any) {
         if (err.code !== "ESRCH") {
             console.error(err);
         }

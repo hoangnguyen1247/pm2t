@@ -36,7 +36,7 @@ commander.version(pkg.version)
     .option("-e --error <path>", "specify log file for stderr")
     .option("-l --log [path]", "specify log file which gathers both stdout and stderr")
     .option("--filter-env [envs]", "filter out outgoing global values that contain provided strings", function (v, m) {
-        m.push(v); return m; 
+        m.push(v); return m;
     }, [])
     .option("--log-type <type>", "specify log output style (raw by default, json optional)")
     .option("--log-date-format <date format>", "add custom prefix timestamp to logs")
@@ -73,7 +73,7 @@ commander.version(pkg.version)
     .option("--wait-ready", "ask pm2 to wait for ready event from your app")
     .option("--merge-logs", "merge logs from different instances but keep error and out separated")
     .option("--watch [paths]", "watch application folder for changes", function (v, m) {
-        m.push(v); return m; 
+        m.push(v); return m;
     }, [])
     .option("--ignore-watch <folders|files>", "List of paths to ignore (name or regex)")
     .option("--watch-delay <delay>", "specify a restart delay after changing files (--watch-delay 4 (in sec) or 4000ms)")
@@ -170,7 +170,7 @@ function checkCompletion() {
         if (cmdProcess.indexOf(data.prev) > -1) {
             pm2.list(function (err, list) {
                 tabtab.log(list.map(function (el) {
-                    return el.name; 
+                    return el.name;
                 }), data);
                 pm2.disconnect();
             });
@@ -270,11 +270,13 @@ commander.command("start [name|namespace|file|ecosystem|id...]")
     .option("--node-version [major]", "with --container, set a specific major Node.js version")
     .option("--dockerdaemon", "for debugging purpose")
     .description("start and daemonize an app")
-    .action(function (cmd, opts) {
+    .action((cmd, opts) => {
         if (opts.container == true && opts.dist == true) {
-            return pm2.dockerMode(cmd, opts, "distribution");
+            // return pm2.dockerMode(cmd, opts, "distribution");
+            pm2.dockerMode(cmd, opts, "distribution");
         } else if (opts.container == true) {
-            return pm2.dockerMode(cmd, opts, "development");
+            // return pm2.dockerMode(cmd, opts, "development");
+            pm2.dockerMode(cmd, opts, "development");
         }
 
         if (cmd == "-") {
@@ -581,7 +583,8 @@ commander.command("link [secret] [public] [name]")
     .option("--ws", "websocket mode")
     .option("--axon", "axon mode")
     .description("link with the pm2 monitoring dashboard")
-    .action(pm2.linkManagement.bind(pm2));
+    // @ts-ignore
+    .action(pm2.linkManagement);
 
 commander.command("unlink")
     .description("unlink with the pm2 monitoring dashboard")

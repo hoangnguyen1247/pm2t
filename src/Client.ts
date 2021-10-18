@@ -24,11 +24,11 @@ import { AnyObject } from "./TypeUtils";
 
 const debug = debugLogger("pm2t:client");
 
-function noop() { 
+function noop() {
     // do nothing
 }
 
-class Client{ 
+class Client{
     conf: AnyObject;
 
     sub_sock: AnyObject;
@@ -43,6 +43,10 @@ class Client{
     pub_socket_file: string;
 
     client: rpc.Client;
+
+    interactor_process;
+    client_sock;
+    sub;
 
     constructor(opts) {
         if (!opts) {
@@ -74,7 +78,7 @@ class Client{
 
     // @breaking change (noDaemonMode has been drop)
     // @todo ret err
-    start = function (cb) {
+    start = (cb) => {
         this.pingDaemon((daemonAlive) => {
             if (daemonAlive === true) {
                 return this.launchRPC((err, meta) => {
@@ -154,11 +158,11 @@ class Client{
     // This includes
     // - pm2 pid and log path
     // - rpc and pub socket for command execution
-    initFileStructure = function (opts) {
+    initFileStructure = (opts) => {
         if (!fs.existsSync(opts.DEFAULT_LOG_PATH)) {
             try {
                 mkdirp.sync(opts.DEFAULT_LOG_PATH);
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e.stack || e);
             }
         }
@@ -166,7 +170,7 @@ class Client{
         if (!fs.existsSync(opts.DEFAULT_PID_PATH)) {
             try {
                 mkdirp.sync(opts.DEFAULT_PID_PATH);
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e.stack || e);
             }
         }
@@ -174,7 +178,7 @@ class Client{
         if (!fs.existsSync(opts.PM2_MODULE_CONF_FILE)) {
             try {
                 fs.writeFileSync(opts.PM2_MODULE_CONF_FILE, "{}");
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e.stack || e);
             }
         }
@@ -182,7 +186,7 @@ class Client{
         if (!fs.existsSync(opts.DEFAULT_MODULE_PATH)) {
             try {
                 mkdirp.sync(opts.DEFAULT_MODULE_PATH);
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e.stack || e);
             }
         }
@@ -190,7 +194,7 @@ class Client{
         if (process.env.PM2_DISCRETE_MODE) {
             try {
                 fs.writeFileSync(path.join(opts.PM2_HOME, "touch"), Date.now().toString());
-            } catch (e) {
+            } catch (e: any) {
                 debug(e.stack || e);
             }
         }
@@ -205,13 +209,13 @@ class Client{
             console.log(dt.toString());
             try {
                 fs.writeFileSync(path.join(opts.PM2_HOME, "touch"), Date.now().toString());
-            } catch (e) {
+            } catch (e: any) {
                 debug(e.stack || e);
             }
         }
     };
 
-    close = function (cb) {
+    close = (cb) => {
         forEach([
             this.disconnectRPC.bind(this),
             this.disconnectBus.bind(this)
@@ -228,7 +232,7 @@ class Client{
      * @param {Object} opts
      * @param {Object} [opts.interactor=true] allow to disable interaction on launch
      */
-    launchDaemon = function (opts, cb) {
+    launchDaemon = (opts, cb?) => {
         if (typeof (opts) == "function") {
             cb = opts;
             opts = {
@@ -333,7 +337,7 @@ class Client{
      * @param {} cb
      * @return
      */
-    pingDaemon = function pingDaemon(cb) {
+    pingDaemon = (cb) => {
         const req = axon.socket("req", null);
         const client = new rpc.Client(req);
 
@@ -349,7 +353,7 @@ class Client{
 
         client.sock.once("error", (e) => {
             if (e.code === "EACCES") {
-                fs.stat(this.conf.DAEMON_RPC_PORT, function (e, stats) {
+                fs.stat(this.conf.DAEMON_RPC_PORT, (e, stats) => {
                     if (stats.uid === 0) {
                         console.error(this.conf.PREFIX_MSG_ERR + "Permission denied, to give access to current user:");
                         console.log("$ sudo chown " + process.env.USER + ":" + process.env.USER + " " + this.conf.DAEMON_RPC_PORT + " " + this.conf.DAEMON_PUB_PORT);
@@ -383,7 +387,7 @@ class Client{
      * @params {function} [cb]
      * @return
      */
-    launchRPC = function launchRPC(cb) {
+    launchRPC = (cb) => {
         debug("Launching RPC client on socket file %s", this.rpc_socket_file);
         const req = axon.socket("req", null);
         this.client = new rpc.Client(req);
@@ -414,7 +418,7 @@ class Client{
      * Methods to close the RPC connection
      * @callback cb
      */
-    disconnectRPC = function disconnectRPC(cb) {
+    disconnectRPC = (cb) => {
         if (!cb) {
             cb = noop;
         }
@@ -453,14 +457,14 @@ class Client{
             }, 200);
 
             this.client_sock.close();
-        } catch (e) {
+        } catch (e: any) {
             debug("Error while disconnecting RPC PM2", e.stack || e);
             return cb(e);
         }
         return false;
     };
 
-    launchBus = function launchEventSystem(cb) {
+    launchBus = (cb) => {
         this.sub = axon.socket("sub-emitter", null);
         this.sub_sock = this.sub.connect(this.pub_socket_file);
 
@@ -469,7 +473,7 @@ class Client{
         });
     };
 
-    disconnectBus = function disconnectBus(cb) {
+    disconnectBus = (cb) => {
         if (!cb) {
             cb = noop;
         }
@@ -518,7 +522,7 @@ class Client{
      * @param {} cb
      * @return
      */
-    getExposedMethods = function getExposedMethods(cb) {
+    getExposedMethods = (cb) => {
         this.client.methods(cb);
     };
 
@@ -530,7 +534,7 @@ class Client{
      * @param {} fn
      * @return
      */
-    executeRemote = (method, app_conf, fn) => {
+    executeRemote = (method, app_conf, fn?) => {
         // stop watch on stop | env is the process id
         if (method.indexOf("stop") !== -1) {
             this.stopWatch(method, app_conf);
@@ -563,7 +567,7 @@ class Client{
         return this.client.call(method, app_conf, fn);
     };
 
-    notifyGod = function (action_name, id, cb) {
+    notifyGod = (action_name, id, cb?) => {
         this.executeRemote("notifyByProcessId", {
             id: id,
             action_name: action_name,
@@ -574,7 +578,7 @@ class Client{
         });
     };
 
-    killDaemon = function killDaemon(fn) {
+    killDaemon = (fn) => {
         let timeout; // eslint-disable-line prefer-const
         const quit = () => {
             this.close(function () {
@@ -631,7 +635,7 @@ class Client{
      * @param {Object} application environment, should include id
      * @param {Function} callback
      */
-    startWatch = function restartWatch(method, env, fn) {
+    startWatch = (method, env, fn) => {
         debug("Calling startWatch");
         this.client.call("startWatch", method, env, function () {
             return fn ? fn() : false;
@@ -652,7 +656,7 @@ class Client{
         });
     };
 
-    getAllProcess = function (cb) {
+    getAllProcess = (cb) => {
         // const found_proc = [];
 
         this.executeRemote("getMonitorData", {}, function (err, procs) {
@@ -665,7 +669,7 @@ class Client{
         });
     };
 
-    getAllProcessId = function (cb) {
+    getAllProcessId = (cb) => {
         // const found_proc = [];
 
         this.executeRemote("getMonitorData", {}, function (err, procs) {
@@ -678,10 +682,10 @@ class Client{
         });
     };
 
-    getAllProcessIdWithoutModules = function (cb) {
+    getAllProcessIdWithoutModules = (cb) => {
         // const found_proc = [];
 
-        this.executeRemote("getMonitorData", {}, function (err, procs) {
+        this.executeRemote("getMonitorData", {}, (err, procs) => {
             if (err) {
                 Common.printError("Error retrieving process list: " + err);
                 return cb(err);
@@ -695,7 +699,7 @@ class Client{
         });
     };
 
-    getProcessIdByName = function (name, force_all, cb) {
+    getProcessIdByName = (name, force_all, cb?) => {
         const found_proc = [];
         const full_details = {};
 
@@ -708,7 +712,7 @@ class Client{
             name = name.toString();
         }
 
-        this.executeRemote("getMonitorData", {}, function (err, list) {
+        this.executeRemote("getMonitorData", {}, (err, list) => {
             if (err) {
                 Common.printError("Error retrieving process list: " + err);
                 return cb(err);
@@ -725,7 +729,7 @@ class Client{
         });
     };
 
-    getProcessIdsByNamespace = function (namespace, force_all, cb) {
+    getProcessIdsByNamespace = (namespace, force_all, cb?) => {
         const found_proc = [];
         const full_details = {};
 
@@ -738,7 +742,7 @@ class Client{
             namespace = namespace.toString();
         }
 
-        this.executeRemote("getMonitorData", {}, function (err, list) {
+        this.executeRemote("getMonitorData", {}, (err, list) => {
             if (err) {
                 Common.printError("Error retrieving process list: " + err);
                 return cb(err);
@@ -755,7 +759,7 @@ class Client{
         });
     };
 
-    getProcessByName = function (name, cb) {
+    getProcessByName = (name, cb) => {
         const found_proc = [];
 
         this.executeRemote("getMonitorData", {}, (err, list) => {
@@ -775,7 +779,7 @@ class Client{
         });
     };
 
-    getProcessByNameOrId = function (nameOrId, cb) {
+    getProcessByNameOrId = (nameOrId, cb) => {
         const foundProc = [];
 
         this.executeRemote("getMonitorData", {}, (err, list) => {

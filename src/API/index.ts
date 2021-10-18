@@ -44,7 +44,7 @@ import Dashboard from "./Dashboard";
 import Monit from "./Monit";
 
 import Utility from "../Utility";
-import pm2Deploy from "pm2t-deploy";
+import pm2Deploy from "../submodules/pm2t-deploy";
 
 import { AnyObject } from "../TypeUtils";
 
@@ -154,7 +154,7 @@ function deployHelper() {
     console.log("    More examples in https://github.com/Unitech/pm2");
     console.log("");
 }
- 
+
 /**
  * From Deploy - End
  */
@@ -208,7 +208,7 @@ function displayConf(target_app, cb?) {
 
 /**
  * From Version - Start
- */ 
+ */
 
 const exec = function (cmd, callback) {
     let output = "";
@@ -283,7 +283,7 @@ const getPostUpdateCmds = function (repo_path, proc_name, cb) {
                 try {
                     const conf_string = fs.readFileSync(repo_path + file);
                     data = Common.parseConfig(conf_string, repo_path + file);
-                } catch (e) {
+                } catch (e: any) {
                     console.error(e.message || e);
                 }
 
@@ -321,7 +321,7 @@ const getPostUpdateCmds = function (repo_path, proc_name, cb) {
 
 /**
  * From Version - Start
- */ 
+ */
 
 /**
  * From Startup - Start
@@ -373,7 +373,7 @@ function detectInitSystem() {
     Common.printOut(cst.PREFIX_MSG + "Init System found: " + chalk.bold(hash_map[init_systems[i]]));
     return hash_map[init_systems[i]];
 }
-  
+
 /**
  * From Startup - End
  */
@@ -545,7 +545,7 @@ function handleExit(CLI, opts, mode) {
             });
         });
     });
-} 
+}
 
 /**
  * From Containerizer - End
@@ -593,6 +593,8 @@ class API {
     gl_retry: number;
 
     connected: boolean;
+
+    start_timer: Date;
 
     constructor(opts?) {
         if (!opts) {
@@ -703,7 +705,7 @@ class API {
      *
      * @param {Function} cb callback once pm2 is ready for commands
      */
-    connect = function (noDaemon, cb?) {
+    connect = (noDaemon, cb?) => {
         this.start_timer = new Date();
 
         if (typeof (cb) == "undefined") {
@@ -739,7 +741,7 @@ class API {
      *
      * @param {Function} cb callback once cleanup is successfull
      */
-    destroy = function (cb) {
+    destroy = (cb) => {
         debug("Killing and deleting current deamon");
 
         this.killDaemon(function () {
@@ -767,9 +769,9 @@ class API {
      *
      * @param {Function} [cb] optional callback once connection closed
      */
-    disconnect = function (cb?) {
+    disconnect = (cb?) => {
         if (!cb) {
-            cb = function () { 
+            cb = function () {
                 // do nothing
             };
         }
@@ -784,7 +786,7 @@ class API {
      * Alias on disconnect
      * @param cb
      */
-    close = function (cb) {
+    close = (cb) => {
         this.disconnect(cb);
     };
 
@@ -793,7 +795,7 @@ class API {
      *
      * @param {Function} cb callback once pm2 has launched modules
      */
-    launchModules = function (cb) {
+    launchModules = (cb) => {
         this.launchAll(this, cb);
     };
 
@@ -803,7 +805,7 @@ class API {
      *
      * @param {Function} cb callback called with 1st param err and 2nb param the bus
      */
-    launchBus = function (cb) {
+    launchBus = (cb) => {
         this.Client.launchBus(cb);
     };
 
@@ -811,7 +813,7 @@ class API {
      * Exit methods for API
      * @param {Integer} code exit code for terminal
      */
-    exitCli = (code) => {
+    exitCli = (code?) => {
         // Do nothing if PM2 called programmatically (also in speedlist)
         if (conf.PM2_PROGRAMMATIC && process.env.PM2_USAGE != "CLI") {
             return false;
@@ -860,7 +862,7 @@ class API {
      * @param {Object||String} cmd script to start or json
      * @param {Function} cb called when application has been started
      */
-    start = function (cmd, opts, cb) {
+    start = (cmd, opts, cb?) => {
         if (typeof (opts) == "function") {
             cb = opts;
             opts = {};
@@ -893,7 +895,7 @@ class API {
      *
      * @method resetMetaProcess
      */
-    reset = function (process_name, cb?) {
+    reset = (process_name, cb?) => {
         const processIds = (ids, cb) => {
             eachLimit(ids, conf.CONCURRENT_ACTIONS, (id, next) => {
                 this.Client.executeRemote("resetMetaProcessId", id, (err, res) => {
@@ -941,11 +943,11 @@ class API {
      *
      * @param {Function} cb callback when pm2 has been upgraded
      */
-    update = function(cb?){
+    update = (cb?) => {
         Common.printOut("Be sure to have the latest version by doing `npm install pm2t@latest -g` before doing this procedure.");
 
         // Dump PM2 processes
-        this.Client.executeRemote("notifyKillPM2", {}, function () { 
+        this.Client.executeRemote("notifyKillPM2", {}, () => {
             // do nothing
         });
 
@@ -990,7 +992,7 @@ class API {
      * @param {Object} opts         Options
      * @param {Function} cb         Callback
      */
-    reload = function (process_name, opts, cb?) {
+    reload = (process_name, opts, cb?) => {
         if (typeof (opts) == "function") {
             cb = opts;
             opts = {};
@@ -1040,7 +1042,7 @@ class API {
      * @param {Object} opts  Extra options to be updated
      * @param {Function} cb  Callback
      */
-    restart = function (cmd, opts, cb) {
+    restart = (cmd, opts, cb) => {
         if (typeof (opts) == "function") {
             cb = opts;
             opts = {};
@@ -1079,7 +1081,7 @@ class API {
      * @param {String} process_name Application Name / Process id / Application file / 'all'
      * @param {Function} cb Callback
      */
-    delete = function (process_name, jsonVia, cb?) {
+    delete = (process_name, jsonVia, cb?) => {
         if (typeof (jsonVia) === "function") {
             cb = jsonVia;
             jsonVia = null;
@@ -1111,7 +1113,7 @@ class API {
      * @param {String} process_name Application Name / Process id / Application file / 'all'
      * @param {Function} cb Callback
      */
-    stop = function (process_name, cb) {
+    stop = (process_name, cb) => {
         if (typeof (process_name) === "number") {
             process_name = process_name.toString();
         }
@@ -1178,10 +1180,10 @@ class API {
      *
      * @param {Function} cb Callback
      */
-    killDaemon = function (cb) {
+    killDaemon = (cb) => {
         process.env.PM2_STATUS = "stopping";
 
-        this.Client.executeRemote("notifyKillPM2", {}, function () { 
+        this.Client.executeRemote("notifyKillPM2", {}, function () {
             // do nothing
         });
 
@@ -1208,7 +1210,7 @@ class API {
         });
     };
 
-    kill = function (cb) {
+    kill = (cb) => {
         this.killDaemon(cb);
     };
 
@@ -1222,7 +1224,7 @@ class API {
      * @private
      * @param {string} script script name (will be resolved according to location)
      */
-    _startScript = function (script, opts, cb) {
+    _startScript = (script, opts, cb) => {
         if (typeof opts == "function") {
             cb = opts;
             opts = {};
@@ -1284,7 +1286,7 @@ class API {
             // pretty JSON
             try {
                 fs.writeFileSync(dst_path, JSON.stringify(app_conf, null, 2));
-            } catch (e) {
+            } catch (e: any) {
                 console.error(e.stack || e);
             }
         }
@@ -1320,7 +1322,7 @@ class API {
         /**
          * If start <namespace> start/restart namespace
          */
-        function restartExistingNameSpace(cb) {
+        const restartExistingNameSpace = (cb) => {
             if (!isNaN(script) ||
                 (typeof script === "string" && script.indexOf("/") != -1) ||
                 (typeof script === "string" && path.extname(script) !== "")) {
@@ -1353,7 +1355,7 @@ class API {
                     return cb(true, list);
                 });
             }
-        }
+        };
 
         const restartExistingProcessId = (cb) => {
             if (isNaN(script)) {
@@ -1416,7 +1418,7 @@ class API {
                         cwd: this.cwd,
                         pm2_home: this.pm2_home
                     }, app_conf);
-                } catch (e) {
+                } catch (e: any) {
                     Common.err(e.message);
                     return cb(Common.retErr(e));
                 }
@@ -1479,7 +1481,7 @@ class API {
      *
      * @private
      */
-    _startJson = function (file, opts, action, pipe?, cb?) {
+    _startJson = (file, opts, action, pipe?, cb?) => {
         let config: any = {};
         let appConf: any[] = [];
         let staticConf = [];
@@ -1573,7 +1575,7 @@ class API {
         // Here we pick only the field we want from the CLI when starting a JSON
         appConf.forEach((app) => {
             if (!app.env) {
-                app.env = {}; 
+                app.env = {};
             }
             app.env.io = app.io;
             // --only <app>
@@ -1740,7 +1742,7 @@ class API {
                         cwd: this.cwd,
                         pm2_home: this.pm2_home
                     }, app);
-                } catch (e) {
+                } catch (e: any) {
                     apps_errored.push(e);
                     Common.err(`Error: ${e.message}`);
                     return next();
@@ -1799,7 +1801,7 @@ class API {
      * @param {string} jsonVia action type (=only 'pipe' ?)
      * @param {Function}
      */
-    actionFromJson = function (action, file, opts, jsonVia, cb) {
+    actionFromJson = (action, file, opts, jsonVia, cb) => {
         let appConf: any = {};
         const ret_processes = [];
 
@@ -1922,7 +1924,7 @@ class API {
      * @param {String} process_name can be 'all', a id integer or process name
      * @param {Object} envs         object with CLI options / environment
      */
-    _operate = function (action_name, process_name, envs, cb?) {
+    _operate = (action_name, process_name, envs, cb?) => {
         let update_env = false;
         const ret = [];
 
@@ -2159,7 +2161,7 @@ class API {
                 this.Client.executeRemote("getMonitorData", {}, (err, proc_list) => {
                     let higher_id = 0;
                     proc_list.forEach(p => {
-                        p.pm_id > higher_id ? higher_id = p.pm_id : null; 
+                        p.pm_id > higher_id ? higher_id = p.pm_id : null;
                     });
 
                     // Is Docker/Systemd
@@ -2215,7 +2217,7 @@ class API {
      * to Underscore
      * (nodeArgs -> node_args)
      */
-    _handleAttributeUpdate = function (opts) {
+    _handleAttributeUpdate = (opts) => {
         const conf: any = Config.filterOptions(opts);
         if (typeof (conf.name) != "string") {
             delete conf.name;
@@ -2274,7 +2276,7 @@ class API {
         return appConf;
     };
 
-    getProcessIdByName = function (name, cb?) {
+    getProcessIdByName = (name, cb?) => {
         this.Client.getProcessIdByName(name, (err, id) => {
             if (err) {
                 Common.printError(err);
@@ -2291,7 +2293,7 @@ class API {
      * @param {} debug
      * @return
      */
-    jlist = function (debug?) {
+    jlist = (debug?) => {
         this.Client.executeRemote("getMonitorData", {}, (err, list) => {
             if (err) {
                 Common.printError(err);
@@ -2313,7 +2315,7 @@ class API {
      * @method slist
      * @return
      */
-    slist = function (tree) {
+    slist = (tree) => {
         this.Client.executeRemote("getSystemData", {}, (err, sys_infos) => {
             if (err) {
                 Common.err(err);
@@ -2385,7 +2387,7 @@ class API {
                 return this.streamLogs("all", 0, false, "HH:mm:ss", false);
             } else if (!process.env.TRAVIS && process.env.NODE_ENV != "test" && acted.length > 0 && (commander.attach === true)) {
             // if (process.stdout.isTTY) if looking for start logs
-                
+
                 Common.info(`Log streaming apps id: ${chalk.cyan(acted.join(" "))}, exit with Ctrl-C or will exit in 10secs`);
 
                 // setTimeout(() => {
@@ -2417,7 +2419,7 @@ class API {
      * Scale up/down a process
      * @method scale
      */
-    scale = function (app_name, number, cb?) {
+    scale = (app_name, number, cb?) => {
         function addProcs(proc, value, cb) {
             (function ex(proc, number) {
                 if (number-- === 0) {
@@ -2705,7 +2707,7 @@ class API {
      * @method getVersion
      * @callback cb
      */
-    profile = function (type, time, cb?) {
+    profile = (type, time, cb?) => {
         const dayjs = require("dayjs");
         let cmd;
 
@@ -2744,7 +2746,7 @@ class API {
      * create boilerplate of application for fast try
      * @method boilerplate
      */
-    boilerplate = function (cb?) {
+    boilerplate = (cb?) => {
         const projects = [];
         const enquirer = require("enquirer");
 
@@ -2794,7 +2796,7 @@ class API {
      * Description
      * @method sendLineToStdin
      */
-    sendLineToStdin = function (pm_id, line, separator?, cb?) {
+    sendLineToStdin = (pm_id, line, separator?, cb?) => {
         if (!cb && typeof (separator) == "function") {
             cb = separator;
             separator = null;
@@ -2818,7 +2820,7 @@ class API {
      * Description
      * @method attachToProcess
      */
-    attach = function (pm_id, separator?, cb?) {
+    attach = (pm_id, separator?, cb?) => {
         const readline = require("readline");
 
         if (isNaN(pm_id)) {
@@ -2855,7 +2857,7 @@ class API {
         });
 
         rl.on("line", (line) => {
-            this.sendLineToStdin(pm_id, line, separator, function () { 
+            this.sendLineToStdin(pm_id, line, separator, function () {
                 // do nothing
             });
         });
@@ -2865,7 +2867,7 @@ class API {
      * Description
      * @method sendDataToProcessId
      */
-    sendDataToProcessId = function (proc_id, packet, cb) {
+    sendDataToProcessId = (proc_id, packet, cb) => {
         if (typeof proc_id === "object" && typeof packet === "function") {
             // the proc_id is packet.
             cb = packet;
@@ -2896,7 +2898,7 @@ class API {
      * @param {String} [uuid]       optional unique identifier when logs are emitted
      *
      */
-    msgProcess = function (opts, cb) {
+    msgProcess = (opts, cb) => {
         this.Client.executeRemote("msgProcess", opts, cb);
     };
 
@@ -2910,7 +2912,7 @@ class API {
      * @param  {Mixed}         params      parameter to pass to target action
      * @param  {Function}      cb          callback
      */
-    trigger = function (pm_id, action_name, params, cb?) {
+    trigger = (pm_id, action_name, params, cb?) => {
         if (typeof (params) === "function") {
             cb = params;
             params = null;
@@ -2968,7 +2970,7 @@ class API {
      * @param {} process_name
      * @return
      */
-    sendSignalToProcessName = function (signal, process_name, cb?) {
+    sendSignalToProcessName = (signal, process_name, cb?) => {
         this.Client.executeRemote("sendSignalToProcessName", {
             signal: signal,
             process_name: process_name
@@ -2989,7 +2991,7 @@ class API {
      * @param {} process_id
      * @return
      */
-    sendSignalToProcessId = function (signal, process_id, cb?) {
+    sendSignalToProcessId = (signal, process_id, cb?) => {
         this.Client.executeRemote("sendSignalToProcessId", {
             signal: signal,
             process_id: process_id
@@ -3006,7 +3008,7 @@ class API {
     /**
      * API method to launch a process that will serve directory over http
      */
-    autoinstall = function (cb?) {
+    autoinstall = (cb?) => {
         const filepath = path.resolve(path.dirname(module.filename), "../Sysinfo/ServiceDetection/ServiceDetection.js");
 
         this.start(filepath, (err, res) => {
@@ -3030,7 +3032,7 @@ class API {
      * @param {Object} commander commander object
      * @param {Function} cb optional callback
      */
-    serve = function (target_path, port, opts, commander, cb?) {
+    serve = (target_path, port, opts, commander, cb?) => {
         const servePort = process.env.PM2_SERVE_PORT || port || 8080;
         const servePath = path.resolve(process.env.PM2_SERVE_PATH || target_path || ".");
 
@@ -3071,7 +3073,7 @@ class API {
      * Ping daemon - if PM2 daemon not launched, it will launch it
      * @method ping
      */
-    ping = function (cb?) {
+    ping = (cb?) => {
         this.Client.executeRemote("ping", {}, (err, res) => {
             if (err) {
                 Common.printError(err);
@@ -3086,7 +3088,7 @@ class API {
     /**
      * Execute remote command
      */
-    remote = function (command, opts, cb) {
+    remote = (command, opts, cb) => {
         this[command](opts.name, function (err_cmd, ret) {
             if (err_cmd) {
                 console.error(err_cmd);
@@ -3101,7 +3103,7 @@ class API {
      * to PM2
      * It is used for the new scoped PM2 action system
      */
-    remoteV2 = function (command, opts, cb) {
+    remoteV2 = (command, opts, cb) => {
         if (this[command].length == 1) {
             return this[command](cb);
         }
@@ -3117,7 +3119,7 @@ class API {
      * @param {} name
      * @return
      */
-    generateSample = function (mode) {
+    generateSample = (mode) => {
         let templatePath;
 
         if (mode == "simple") {
@@ -3133,7 +3135,7 @@ class API {
 
         try {
             fs.writeFileSync(path.join(pwd, f_name), dt);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e.stack || e);
             return this.exitCli(cst.ERROR_EXIT);
         }
@@ -3146,7 +3148,7 @@ class API {
      * @method dashboard
      * @return
      */
-    dashboard = function (cb?) {
+    dashboard = (cb?) => {
         if (cb) {
             return cb(new Error("Dashboard cant be called programmatically"));
         }
@@ -3187,7 +3189,7 @@ class API {
         refreshDashboard();
     };
 
-    monit = function (cb?) {
+    monit = (cb?) => {
         if (cb) {
             return cb(new Error("Monit cant be called programmatically"));
         }
@@ -3212,7 +3214,7 @@ class API {
         launchMonitor();
     };
 
-    inspect = function (app_name, cb?) {
+    inspect = (app_name, cb?) => {
         if (semver.satisfies(process.versions.node, ">= 8.0.0")) {
             this.trigger(app_name, "internal:inspect", (err, res) => {
 
@@ -3242,7 +3244,7 @@ class API {
      * From Deploy - Start
      */
 
-    deploy = function (file, commands, cb?) {
+    deploy = (file, commands, cb?) => {
         if (file == "help") {
             deployHelper();
             return cb ? cb() : this.exitCli(cst.SUCCESS_EXIT);
@@ -3305,8 +3307,8 @@ class API {
     /**
      * From Deploy - End
      */
-    
-    
+
+
     /**
      * From Module - Start
      */
@@ -3314,7 +3316,7 @@ class API {
     /**
      * Install / Update a module
      */
-    install = function (module_name, opts?, cb?) {
+    install = (module_name, opts?, cb?) => {
         if (typeof (opts) == "function") {
             cb = opts;
             opts = {};
@@ -3332,7 +3334,7 @@ class API {
     /**
      * Uninstall a module
      */
-    uninstall = function (module_name, cb?) {
+    uninstall = (module_name, cb?) => {
         Modularizer.uninstall(this, module_name, (err, data) => {
             if (err) {
                 return cb ? cb(Common.retErr(err)) : this.speedList(cst.ERROR_EXIT);
@@ -3341,11 +3343,11 @@ class API {
         });
     };
 
-    launchAll = function (CLI, cb) {
+    launchAll = (CLI, cb) => {
         Modularizer.launchModules(CLI, cb);
     };
 
-    package = function (module_path, cb?) {
+    package = (module_path, cb?) => {
         Modularizer.package(this, module_path, (err, res) => {
             if (err) {
                 Common.errMod(err);
@@ -3359,7 +3361,7 @@ class API {
     /**
      * Publish module on NPM + Git push
      */
-    publish = function (folder, opts, cb?) {
+    publish = (folder, opts, cb?) => {
         Modularizer.publish(this, folder, opts, (err, data) => {
             if (err) {
                 return cb ? cb(Common.retErr(err)) : this.speedList(cst.ERROR_EXIT);
@@ -3371,7 +3373,7 @@ class API {
     /**
      * Publish module on NPM + Git push
      */
-    generateModuleSample = function (app_name, cb?) {
+    generateModuleSample = (app_name, cb?) => {
         Modularizer.generateSample(app_name, (err, data) => {
             if (err) {
                 return cb ? cb(Common.retErr(err)) : this.exitCli(cst.ERROR_EXIT);
@@ -3383,7 +3385,7 @@ class API {
     /**
      * Special delete method
      */
-    deleteModule = function (module_name, cb) {
+    deleteModule = (module_name, cb) => {
         const found_proc = [];
 
         this.Client.getAllProcess((err, procs) => {
@@ -3419,9 +3421,9 @@ class API {
 
     /**
      * From Configuration - Start
-     */ 
+     */
 
-    get = function (key?, cb?) {
+    get = (key?, cb?) => {
         if (!key || key == "all") {
             displayConf((err, data) => {
                 if (err) {
@@ -3461,7 +3463,7 @@ class API {
         });
     };
 
-    set = function (key, value, cb?) {
+    set = (key, value, cb?) => {
         if (!key) {
             interactiveConfigEdit((err) => {
                 if (err) {
@@ -3515,7 +3517,7 @@ class API {
         });
     };
 
-    multiset = function (serial, cb?) {
+    multiset = (serial, cb?) => {
         Configuration.multiset(serial, (err, data) => {
             if (err) {
                 return cb ? cb({ success: false, err: err }) : this.exitCli(cst.ERROR_EXIT);
@@ -3557,19 +3559,19 @@ class API {
         });
     };
 
-    unset = function (key, cb?) {
+    unset = (key, cb?) => {
         Configuration.unset(key, (err) => {
             if (err) {
                 return cb ? cb(Common.retErr(err)) : this.exitCli(cst.ERROR_EXIT);
             }
 
             displayConf(() => {
-                cb ? cb(null, { success: true }) : this.exitCli(cst.SUCCESS_EXIT); 
+                cb ? cb(null, { success: true }) : this.exitCli(cst.SUCCESS_EXIT);
             });
         });
     };
 
-    conf = function (key, value, cb?) {
+    conf = (key, value, cb?) => {
         if (typeof (value) === "function") {
             cb = value;
             value = null;
@@ -3605,13 +3607,13 @@ class API {
     /**
      * From Configuration - End
      */
-    
-    
+
+
     /**
      * From Version - Start
      */
 
-    _pull = function (opts, cb?) {
+    _pull = (opts, cb?) => {
         const process_name = opts.process_name;
         const reload_type = opts.action;
 
@@ -3674,7 +3676,7 @@ class API {
      * @param {string} commit_id
      * @return
      */
-    pullCommitId = function (process_name, commit_id, cb?) {
+    pullCommitId = (process_name, commit_id, cb?) => {
         const reload_type = "reload";
         printOut(cst.PREFIX_MSG + "Updating repository for process name %s", process_name);
 
@@ -3729,7 +3731,7 @@ class API {
      * @param {string} process_name
      * @return
      */
-    backward = function (process_name, cb?) {
+    backward = (process_name, cb?) => {
         printOut(cst.PREFIX_MSG + "Downgrading to previous commit repository for process name %s", process_name);
 
         this.Client.getProcessByNameOrId(process_name, (err, processes) => {
@@ -3790,7 +3792,7 @@ class API {
      * @param {string} process_name
      * @return
      */
-    forward = function (process_name, cb?) {
+    forward = (process_name, cb?) => {
         printOut(cst.PREFIX_MSG + "Updating to next commit repository for process name %s", process_name);
 
         this.Client.getProcessByNameOrId(process_name, (err, processes) => {
@@ -3846,7 +3848,7 @@ class API {
      * @param {string} process_name name of processes to pull
      * @return
      */
-    pullAndRestart = function (process_name, cb?) {
+    pullAndRestart = (process_name, cb?) => {
         this._pull({ process_name: process_name, action: "reload" }, cb);
     };
 
@@ -3856,7 +3858,7 @@ class API {
      * @param {string} process_name name of processes to pull
      * @return
      */
-    pullAndReload = function (process_name, cb?) {
+    pullAndReload = (process_name, cb?) => {
         this._pull({ process_name: process_name, action: "reload" }, cb);
     };
 
@@ -3866,26 +3868,26 @@ class API {
      * @param {object} opts
      * @return
      */
-    _pullCommitId = function (opts, cb?) {
+    _pullCommitId = (opts, cb?) => {
         this.pullCommitId(opts.pm2_name, opts.commit_id, cb);
-    }; 
-    
+    };
+
     /**
      * From Version - End
      */
 
     /**
-     * From Startup - Start 
-     */ 
+     * From Startup - Start
+     */
 
-    uninstallStartup = function (platform, opts, cb?) {
+    uninstallStartup = (platform, opts, cb?) => {
         let commands;
         const actual_platform = detectInitSystem();
         const user = opts.user || process.env.USER || process.env.LOGNAME; // Use LOGNAME on Solaris-like systems
         let service_name = (opts.serviceName || "pm2-" + user);
         const openrc_service_name = "pm2";
         const launchd_service_name = (opts.serviceName || "pm2." + user);
-    
+
         if (!platform) {
             platform = actual_platform;
         } else if (actual_platform && actual_platform !== platform) {
@@ -3898,7 +3900,7 @@ class API {
         if (platform === null) {
             throw new Error("Init system not found");
         }
-    
+
         if (!cb) {
             cb = (err, data) => {
                 if (err) {
@@ -3907,15 +3909,15 @@ class API {
                 return this.exitCli(cst.SUCCESS_EXIT);
             };
         }
-    
+
         if (process.getuid() != 0) {
             return isNotRoot("unsetup", platform, opts, cb);
         }
-    
+
         if (fs.existsSync("/etc/init.d/pm2-init.sh")) {
             platform = "oldsystem";
         }
-    
+
         let destination;
         switch (platform) {
             case "systemd":
@@ -3985,7 +3987,7 @@ class API {
                     "svccfg delete -f " + service_name
                 ];
         }
-    
+
         sexec(commands.join("&& "), function (code, stdout, stderr) {
             Common.printOut(stdout);
             Common.printOut(stderr);
@@ -3994,26 +3996,26 @@ class API {
             } else {
                 Common.printOut(cst.ERROR_MSG + chalk.bold("Return code : " + code));
             }
-    
+
             cb(null, {
                 commands: commands,
                 platform: platform
             });
         });
     };
-    
+
     /**
        * Startup script generation
        * @method startup
        * @param {string} platform type (centos|redhat|amazon|gentoo|systemd|smf)
        */
-    startup = function (platform, opts, cb?) {
+    startup = (platform, opts, cb?) => {
         const actual_platform = detectInitSystem();
         const user = (opts.user || process.env.USER || process.env.LOGNAME); // Use LOGNAME on Solaris-like systems
         let service_name = (opts.serviceName || "pm2-" + user);
         const openrc_service_name = "pm2";
         const launchd_service_name = (opts.serviceName || "pm2." + user);
-    
+
         if (!platform) {
             platform = actual_platform;
         } else if (actual_platform && actual_platform !== platform) {
@@ -4026,7 +4028,7 @@ class API {
         if (platform == null) {
             throw new Error("Init system not found");
         }
-    
+
         if (!cb) {
             cb = (err, data) => {
                 if (err) {
@@ -4035,19 +4037,19 @@ class API {
                 return this.exitCli(cst.SUCCESS_EXIT);
             };
         }
-    
+
         if (process.getuid() != 0) {
             return isNotRoot("setup", platform, opts, cb);
         }
-    
+
         let destination;
         let commands;
         let template;
-    
+
         function getTemplate(type) {
             return fs.readFileSync(path.join(__dirname, "..", "templates/init-scripts", type + ".tpl"), { encoding: "utf8" });
         }
-    
+
         switch (platform) {
             case "ubuntu":
             case "centos":
@@ -4143,12 +4145,12 @@ class API {
             default:
                 throw new Error("Unknown platform / init system name");
         }
-    
+
         /**
          * 4# Replace template variable value
          */
         let envPath;
-    
+
         if (cst.HAS_NODE_EMBEDDED == true) {
             envPath = util.format("%s:%s", process.env.PATH || "", path.dirname(process.execPath));
         } else if (new RegExp(path.dirname(process.execPath)).test(process.env.PATH)) {
@@ -4156,13 +4158,13 @@ class API {
         } else {
             envPath = util.format("%s:%s", process.env.PATH || "", path.dirname(process.execPath));
         }
-    
+
         template = template.replace(/%PM2_PATH%/g, process.mainModule.filename)
             .replace(/%NODE_PATH%/g, envPath)
             .replace(/%USER%/g, user)
             .replace(/%HOME_PATH%/g, opts.hp ? path.resolve(opts.hp, ".pm2") : cst.PM2_ROOT_PATH)
             .replace(/%SERVICE_NAME%/g, service_name);
-    
+
         Common.printOut(chalk.bold("Platform"), platform);
         Common.printOut(chalk.bold("Template"));
         Common.printOut(template);
@@ -4170,21 +4172,21 @@ class API {
         Common.printOut(destination);
         Common.printOut(chalk.bold("Command list"));
         Common.printOut(commands);
-    
+
         Common.printOut(cst.PREFIX_MSG + "Writing init configuration in " + destination);
         try {
             fs.writeFileSync(destination, template);
-        } catch (e) {
+        } catch (e: any) {
             console.error(cst.PREFIX_MSG_ERR + "Failure when trying to write startup script");
             console.error(e.message || e);
             return cb(e);
         }
-    
+
         Common.printOut(cst.PREFIX_MSG + "Making script booting at startup...");
-    
+
         forEachLimit(commands, 1, function (command, next) {
             Common.printOut(cst.PREFIX_MSG + "[-] Executing: %s...", chalk.bold(command));
-    
+
             sexec(command, function (code, stdout, stderr) {
                 if (code === 0) {
                     Common.printOut(cst.PREFIX_MSG + chalk.bold("[v] Command successfully executed."));
@@ -4194,7 +4196,7 @@ class API {
                     return next(new Error(command + " failed, see error above."));
                 }
             });
-    
+
         }, function (err) {
             if (err) {
                 console.error(cst.PREFIX_MSG_ERR + (err.message || err));
@@ -4206,46 +4208,46 @@ class API {
             Common.printOut("");
             Common.printOut(chalk.bold.blue(cst.PREFIX_MSG + "Remove init script via:"));
             Common.printOut(chalk.bold("$ pm2 unstartup " + platform));
-    
+
             return cb(null, {
                 destination: destination,
                 template: template
             });
         });
     };
-    
+
     /**
        * DISABLED FEATURE
        * KEEPING METHOD FOR BACKWARD COMPAT
        */
-    autodump = function (cb?) {
+    autodump = (cb?) => {
         return cb();
     };
-    
+
     /**
        * Dump current processes managed by pm2 into DUMP_FILE_PATH file
        * @method dump
        * @param {} cb
        * @return
        */
-    dump = function (force, cb?) {
+    dump = (force, cb?) => {
         const env_arr = [];
-    
+
         if (typeof (force) === "function") {
             cb = force;
             force = false;
         }
-    
+
         if (!cb) {
             Common.printOut(cst.PREFIX_MSG + "Saving current process list...");
         }
-    
+
         this.Client.executeRemote("getMonitorData", {}, (err, list) => {
             if (err) {
                 Common.printError("Error retrieving process list: " + err);
                 return cb ? cb(Common.retErr(err)) : this.exitCli(cst.ERROR_EXIT);
             }
-    
+
             /**
            * Description
            * @method fin
@@ -4253,16 +4255,16 @@ class API {
            * @return
            */
             const fin = (err) => {
-    
+
                 // try to fix issues with empty dump file
                 // like #3485
                 if (!force && env_arr.length === 0 && !process.env.FORCE) {
-    
+
                     // fix : if no dump file, no process, only module and after pm2 update
                     if (!fs.existsSync(cst.DUMP_FILE_PATH)) {
                         this.clearDump(() => { });
                     }
-    
+
                     // if no process in list don't modify dump file
                     // process list should not be empty
                     if (cb) {
@@ -4274,28 +4276,28 @@ class API {
                         return;
                     }
                 }
-    
+
                 // Back up dump file
                 try {
                     if (fs.existsSync(cst.DUMP_FILE_PATH)) {
                         fs.writeFileSync(cst.DUMP_BACKUP_FILE_PATH, fs.readFileSync(cst.DUMP_FILE_PATH));
                     }
-                } catch (e) {
+                } catch (e: any) {
                     console.error(e.stack || e);
                     Common.printOut(cst.PREFIX_MSG_ERR + "Failed to back up dump file in %s", cst.DUMP_BACKUP_FILE_PATH);
                 }
-    
+
                 // Overwrite dump file, delete if broken and exit
                 try {
                     fs.writeFileSync(cst.DUMP_FILE_PATH, JSON.stringify(env_arr, [""], 2));
-                } catch (e) {
+                } catch (e: any) {
                     console.error(e.stack || e);
                     try {
                         // try to backup file
                         if (fs.existsSync(cst.DUMP_BACKUP_FILE_PATH)) {
                             fs.writeFileSync(cst.DUMP_FILE_PATH, fs.readFileSync(cst.DUMP_BACKUP_FILE_PATH));
                         }
-                    } catch (e) {
+                    } catch (e: any) {
                         // don't keep broken file
                         fs.unlinkSync(cst.DUMP_FILE_PATH);
                         console.error(e.stack || e);
@@ -4306,11 +4308,11 @@ class API {
                 if (cb) {
                     return cb(null, { success: true });
                 }
-    
+
                 Common.printOut(cst.PREFIX_MSG + "Successfully saved in %s", cst.DUMP_FILE_PATH);
                 return this.exitCli(cst.SUCCESS_EXIT);
             };
-    
+
             (function ex(apps) {
                 if (!apps[0]) {
                     return fin(null);
@@ -4326,35 +4328,35 @@ class API {
             })(list);
         });
     };
-    
+
     /**
        * Remove DUMP_FILE_PATH file and DUMP_BACKUP_FILE_PATH file
        * @method dump
        * @param {} cb
        * @return
        */
-    clearDump = function (cb?) {
+    clearDump = (cb?) => {
         fs.writeFileSync(cst.DUMP_FILE_PATH, JSON.stringify([]));
-    
+
         if (cb && typeof cb === "function") {
             return cb();
         }
-    
+
         Common.printOut(cst.PREFIX_MSG + "Successfully created %s", cst.DUMP_FILE_PATH);
         return this.exitCli(cst.SUCCESS_EXIT);
     };
-    
+
     /**
        * Resurrect processes
        * @method resurrect
        * @param {} cb
        * @return
        */
-    resurrect = function (cb?) {
+    resurrect = (cb?) => {
         let apps = {};
-    
+
         let processes;
-    
+
         function readDumpFile(dumpFilePath) {
             Common.printOut(cst.PREFIX_MSG + "Restoring processes located in %s", dumpFilePath);
             let apps;
@@ -4364,10 +4366,10 @@ class API {
                 Common.printError(cst.PREFIX_MSG_ERR + "Failed to read dump file in %s", dumpFilePath);
                 throw e;
             }
-    
+
             return apps;
         }
-    
+
         function parseDumpFile(dumpFilePath, apps) {
             let processes;
             try {
@@ -4376,15 +4378,15 @@ class API {
                 Common.printError(cst.PREFIX_MSG_ERR + "Failed to parse dump file in %s", dumpFilePath);
                 try {
                     fs.unlinkSync(dumpFilePath);
-                } catch (e) {
+                } catch (e: any) {
                     console.error(e.stack || e);
                 }
                 throw e;
             }
-    
+
             return processes;
         }
-    
+
         // Read dump file, fall back to backup, delete if broken
         try {
             apps = readDumpFile(cst.DUMP_FILE_PATH);
@@ -4400,34 +4402,34 @@ class API {
                 return this.speedList();
             }
         }
-    
+
         this.Client.executeRemote("getMonitorData", {}, (err, list) => {
             if (err) {
                 Common.printError(err);
                 return this.exitCli(1);
             }
-    
+
             const current = [];
             const target = [];
-    
+
             list.forEach(function (app) {
                 if (!current[app.name]) {
                     current[app.name] = 0;
                 }
                 current[app.name]++;
             });
-    
+
             processes.forEach(function (app) {
                 if (!target[app.name]) {
                     target[app.name] = 0;
                 }
                 target[app.name]++;
             });
-    
+
             const tostart = Object.keys(target).filter(function (i) {
                 return Object.keys(current).indexOf(i) < 0;
             });
-    
+
             eachLimit(processes, cst.CONCURRENT_ACTIONS, (app, next) => {
                 if (tostart.indexOf(app.name) == -1) {
                     return next();
@@ -4446,19 +4448,19 @@ class API {
         });
     };
     /**
-       * From Startup - End 
-       */ 
+       * From Startup - End
+       */
 
     /**
      * From Mgnt - Start
-     */   
+     */
 
     /**
    * Description
    * @method flush
    * @return
    */
-    flush = function (api, cb?) {
+    flush = (api, cb?) => {
         if (!api) {
             Common.printOut(cst.PREFIX_MSG + "Flushing " + cst.PM2_LOG_FILE_PATH);
             fs.closeSync(fs.openSync(cst.PM2_LOG_FILE_PATH, "w"));
@@ -4506,7 +4508,7 @@ class API {
         });
     };
 
-    logrotate = function (opts, cb?) {
+    logrotate = (opts, cb?) => {
         if (process.getuid() != 0) {
             return exec("whoami", (err, stdout, stderr) => {
                 Common.printError(cst.PREFIX_MSG + "You have to run this command as root. Execute the following command:");
@@ -4532,7 +4534,7 @@ class API {
 
         try {
             fs.writeFileSync("/etc/logrotate.d/pm2-" + user, script);
-        } catch (e) {
+        } catch (e: any) {
             console.error(e.stack || e);
         }
 
@@ -4545,7 +4547,7 @@ class API {
    * @method reloadLogs
    * @return
    */
-    reloadLogs = function (cb?) {
+    reloadLogs = (cb?) => {
         Common.printOut("Reloading all logs...");
         this.Client.executeRemote("reloadLogs", {}, (err, logs) => {
             if (err) {
@@ -4716,7 +4718,7 @@ class API {
    * @param {Boolean} raw
    * @return
    */
-    printLogs = function (id, lines, raw, timestamp, exclusive) {
+    printLogs = (id, lines, raw, timestamp, exclusive) => {
         const files_list = [];
 
         // If no argument is given, we stream logs for all running apps
@@ -4819,12 +4821,12 @@ class API {
     };
     /**
    * From Mgnt - End
-   */ 
+   */
 
     /**
     * From Containerizer - Start
     */
-    generateDockerfile = function (script, opts) {
+    generateDockerfile = (script, opts) => {
         const docker_filepath = path.join(process.cwd(), "Dockerfile");
 
         fs.stat(docker_filepath, (err, stat) => {
@@ -4844,7 +4846,7 @@ class API {
         });
     };
 
-    dockerMode = function (script, opts, mode) {
+    dockerMode = (script, opts, mode) => {
         const promptly = require("promptly");
         handleExit(this, opts, mode);
 
@@ -4991,7 +4993,7 @@ class API {
   * From pm2-plus link - Start
   */
 
-    linkManagement = function (cmd, public_key, machine, opts, cb) {
+    linkManagement = (cmd, public_key, machine?, opts?, cb?) => {
         // pm2 link stop || kill
         if (cmd == "stop" || cmd == "kill") {
             this.gl_is_km_linked = false;
@@ -5079,7 +5081,7 @@ class API {
         this.link(infos, cb);
     };
 
-    link = function (infos, cb) {
+    link = (infos, cb) => {
         if (infos && !infos.machine_name) {
             infos.machine_name = require("os").hostname() + "-" + require("crypto").randomBytes(2).toString("hex");
         }
@@ -5097,7 +5099,7 @@ class API {
         });
     };
 
-    agentInfos = function (cb) {
+    agentInfos = (cb) => {
         KMDaemon.getInteractInfo(this._conf, function (err, data) {
             if (err) {
                 return cb(Common.retErr(err));
@@ -5106,7 +5108,7 @@ class API {
         });
     };
 
-    killAgent = function (cb) {
+    killAgent = (cb) => {
         KMDaemon.killInteractorDaemon(this._conf, (err) => {
             if (err) {
                 return cb ? cb(Common.retErr(err)) : this.exitCli(cst.SUCCESS_EXIT);
@@ -5115,7 +5117,7 @@ class API {
         });
     };
 
-    unlink = function (cb?) {
+    unlink = (cb?) => {
         this.linkManagement("delete", cb);
     };
     /**
@@ -5131,7 +5133,7 @@ class API {
      * @param String target <pm_id|name|all>
      * @param Function cb callback
      */
-    monitorState = function (state, target, cb?) {
+    monitorState = (state, target, cb?) => {
         if (!target) {
             Common.printError(cst.PREFIX_MSG_ERR + "Please specify an <app_name|pm_id>");
             return cb ? cb(new Error("argument missing")) : this.exitCli(cst.ERROR_EXIT);
@@ -5174,10 +5176,10 @@ class API {
      */
 
     /**
-      * From pm2-plus helpers - Start 
+      * From pm2-plus helpers - Start
       */
 
-    openDashboard = function () {
+    openDashboard = () => {
         if (!this.gl_interact_infos) {
             Common.printError(chalk.bold.white("Agent if offline, type `$ pm2 plus` to log in"));
             return this.exitCli(cst.ERROR_EXIT);
@@ -5191,7 +5193,7 @@ class API {
         }, 200);
     };
 
-    clearSetup = function (opts, cb) {
+    clearSetup = (opts, cb) => {
         const modules = ["event-loop-inspector"];
         this.gl_is_km_linked = false;
 
@@ -5200,7 +5202,8 @@ class API {
         }
 
         forEach(modules, (_module, next) => {
-            this.uninstall(this, _module, () => {
+            // this.uninstall(this, _module, () => {
+            this.uninstall(_module, () => {
                 next();
             });
         }, (err) => {
@@ -5213,7 +5216,7 @@ class API {
     /**
      * Install required package and enable flags for current running processes
      */
-    minimumSetup = function (opts, cb) {
+    minimumSetup = (opts, cb) => {
         this.gl_is_km_linked = true;
 
         const install = (cb) => {
@@ -5230,7 +5233,8 @@ class API {
             }
 
             forEach(modules, (_module, next) => {
-                this.install(this, _module, {}, () => {
+                // this.install(this, _module, {}, () => {
+                this.install(_module, {}, () => {
                     next();
                 });
             }, (err) => {
@@ -5260,21 +5264,21 @@ class API {
         });
     };
 
-    processesAreAlreadyMonitored = function(cb) {
+    processesAreAlreadyMonitored = (cb) => {
         this.Client.executeRemote("getMonitorData", {}, function (err, list) {
             if (err) {
                 return cb(false);
             }
             const l = list.filter(l => l.pm2_env.km_link == true);
             const l2 = list.filter(l => l.name == "pm2-server-monit");
-    
+
             // return cb(l.length > 0 && l2.length > 0 ? true : false)
             cb(l.length > 0 && l2.length > 0 ? true : false);
         });
     };
 
     /**
-     * From pm2-plus helpers - End 
+     * From pm2-plus helpers - End
      */
 }
 
