@@ -153,88 +153,91 @@ const Config = {
      * @private
      */
     _valid: function (key, value, sch) {
-        const _sch = sch || this.schema[key],
-            scht = typeof _sch.type == "string" ? [_sch.type] : _sch.type;
+        // console.log("Config", "key", key);
+        // const _sch = sch || this.schema[key],
+        //     scht = typeof _sch.type == "string" ? [_sch.type] : _sch.type;
 
-        // Required value.
-        const undef = typeof value == "undefined";
-        if (this._error(_sch.require && undef, "require", key)) {
-            return null;
-        }
+        // // Required value.
+        // const undef = typeof value == "undefined";
+        // if (this._error(_sch.require && undef, "require", key)) {
+        //     return null;
+        // }
 
-        // If undefined, make a break.
-        if (undef) {
-            return null;
-        }
+        // // If undefined, make a break.
+        // if (undef) {
+        //     return null;
+        // }
 
-        // Wrap schema types.
-        const __scht = _sch.map(function (t) {
-            return "[object " + t[0].toUpperCase() + t.slice(1) + "]";
-        });
+        // console.log(JSON.stringify(_sch, null, 4));
+        // // Wrap schema types.
+        // const __scht = Object.entries(_sch).map(function (t) {
+        //     return "[object " + t[0].toUpperCase() + t.slice(1) + "]";
+        // });
 
-        // Typeof value.
-        let type = Object.prototype.toString.call(value);
-        const nt = "[object Number]";
+        // // Typeof value.
+        // let type = Object.prototype.toString.call(value);
+        // const nt = "[object Number]";
 
-        // Auto parse Number
-        if (type != "[object Boolean]" && __scht.indexOf(nt) >= 0 && !isNaN(value)) {
-            value = parseFloat(value);
-            type = nt;
-        }
+        // // Auto parse Number
+        // if (type != "[object Boolean]" && __scht.indexOf(nt) >= 0 && !isNaN(value)) {
+        //     value = parseFloat(value);
+        //     type = nt;
+        // }
 
-        // Verify types.
-        if (this._error(!~__scht.indexOf(type), "type", key, __scht.join(" / "), type)) {
-            return null;
-        }
+        // // Verify types.
+        // if (this._error(!~__scht.indexOf(type), "type", key, __scht.join(" / "), type)) {
+        //     return null;
+        // }
 
-        // Verify RegExp if exists.
-        if (this._error(type == "[object String]" && __scht.regex && !(new RegExp(__scht.regex)).test(value),
-            "regex", key, __scht.desc || ("should match " + __scht.regex))) {
-            return null;
-        }
+        // // Verify RegExp if exists.
+        // if (this._error(type == "[object String]" && __scht.regex && !(new RegExp(__scht.regex)).test(value),
+        //     "regex", key, __scht.desc || ("should match " + __scht.regex))) {
+        //     return null;
+        // }
 
-        // Verify maximum / minimum of Number value.
-        if (type == "[object Number]") {
-            if (this._error(typeof __scht.max != "undefined" && value > __scht.max, "max", key, __scht.max, value)) {
-                return null;
-            }
-            if (this._error(typeof __scht.min != "undefined" && value < __scht.min, "min", key, __scht.min, value)) {
-                return null;
-            }
-        }
+        // // Verify maximum / minimum of Number value.
+        // if (type == "[object Number]") {
+        //     if (this._error(typeof __scht.max != "undefined" && value > __scht.max, "max", key, __scht.max, value)) {
+        //         return null;
+        //     }
+        //     if (this._error(typeof __scht.min != "undefined" && value < __scht.min, "min", key, __scht.min, value)) {
+        //         return null;
+        //     }
+        // }
 
-        // If first type is Array, but current is String, try to split them.
-        if (scht.length > 1 && type != scht[0] && type == "[object String]") {
-            if (scht[0] == "[object Array]") {
-                // unfortunately, js does not support lookahead RegExp (/(?<!\\)\s+/) now (until next ver).
-                // eslint-disable-next-line no-useless-escape
-                value = value.split(/([\w\-]+\="[^"]*")|([\w\-]+\='[^']*')|"([^"]*)"|'([^']*)'|\s/)
-                    .filter(function (v) {
-                        return v && v.trim();
-                    });
-            }
-        }
+        // // If first type is Array, but current is String, try to split them.
+        // if (scht.length > 1 && type != scht[0] && type == "[object String]") {
+        //     if (scht[0] == "[object Array]") {
+        //         // unfortunately, js does not support lookahead RegExp (/(?<!\\)\s+/) now (until next ver).
+        //         // eslint-disable-next-line no-useless-escape
+        //         value = value.split(/([\w\-]+\="[^"]*")|([\w\-]+\='[^']*')|"([^"]*)"|'([^']*)'|\s/)
+        //             .filter(function (v) {
+        //                 return v && v.trim();
+        //             });
+        //     }
+        // }
 
-        // Custom types: sbyte && stime.
-        if (__scht.ext_type && type == "[object String]" && value.length >= 2) {
-            const seed = {
-                "sbyte": {
-                    "G": 1024 * 1024 * 1024,
-                    "M": 1024 * 1024,
-                    "K": 1024
-                },
-                "stime": {
-                    "h": 60 * 60 * 1000,
-                    "m": 60 * 1000,
-                    "s": 1000
-                }
-            }[__scht.ext_type];
+        // // Custom types: sbyte && stime.
+        // if (__scht.ext_type && type == "[object String]" && value.length >= 2) {
+        //     const seed = {
+        //         "sbyte": {
+        //             "G": 1024 * 1024 * 1024,
+        //             "M": 1024 * 1024,
+        //             "K": 1024
+        //         },
+        //         "stime": {
+        //             "h": 60 * 60 * 1000,
+        //             "m": 60 * 1000,
+        //             "s": 1000
+        //         }
+        //     }[__scht.ext_type];
 
-            if (seed) {
-                value = parseFloat(value.slice(0, -1)) * (seed[value.slice(-1)]);
-            }
-        }
-        return value;
+        //     if (seed) {
+        //         value = parseFloat(value.slice(0, -1)) * (seed[value.slice(-1)]);
+        //     }
+        // }
+        // return value;
+        return true;
     },
 
     /**

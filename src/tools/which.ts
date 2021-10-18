@@ -10,8 +10,8 @@ const XP_DEFAULT_PATHEXT = ".com;.exe;.bat;.cmd;.vbs;.vbe;.js;.jse;.wsf;.wsh";
 // For earlier versions of NodeJS that doesn't have a list of constants (< v6)
 const FILE_EXECUTABLE_MODE = 1;
 
-function statFollowLinks(...args) {
-    return fs.statSync(args as any);
+function statFollowLinks(args) {
+    return fs.statSync(args);
 }
 
 function isWindowsPlatform() {
