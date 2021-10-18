@@ -10,7 +10,7 @@
             "ES2017.object"
         ],
         "sourceMap": true,
-        "outDir": "./lib2",
+        "outDir": "./lib",
         "rootDir": ".",
         "declaration": true,
         "declarationMap": false,

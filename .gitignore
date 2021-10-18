@@ -1,7 +1,6 @@
 node_modules
 
 /lib
-/lib2
 
 .env
 .npmrc

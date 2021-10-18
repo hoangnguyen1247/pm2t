@@ -7,7 +7,7 @@
     },
     "directories": {
         "bin": "./bin",
-        "lib": "./lib2",
+        "lib": "./lib",
         "example": "./examples"
     },
     "author": {
@@ -27,17 +27,17 @@
     "main": "index.js",
     "types": "types/index.d.ts",
     "scripts": {
-        "clean:build": "rimraf lib2",
+        "clean:build": "rimraf lib",
         "start": "node -r ts-node/register ./src/binaries/CLI.ts",
         "start:bin": "node ./bin/pm2t",
         "start:ts": "ts-node ./src/binaries/CLI",
         "dev": "ts-node ./src/binaries/CLI",
         "debug": "node inspect -r ts-node/register ./src/binaries/CLI",
-        "dev0": "node ./lib2/binaries/CLI",
+        "dev0": "node ./lib/binaries/CLI",
         "format": "eslint . --ext ts --ext js --fix",
         "lint": "eslint . --ext ts --ext js",
         "type-check": "tsc -p tsconfig.types.json --noEmit",
-        "build:lib": "babel src --out-dir lib2 --extensions \".js,.ts,.tsx\"",
+        "build:lib": "babel src --out-dir lib --extensions \".js,.ts,.tsx\"",
         "build": "npm run clean:build && npm run build:lib",
         "release": "semantic-release",
         "test": "bash test/unit.sh && bash test/e2e.sh"

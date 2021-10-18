@@ -6,7 +6,7 @@
 
 process.env.PM2_PROGRAMMATIC = "true";
 
-var API = require("./lib2/API/index.js");
+var API = require("./lib/API/index.js");
 
 module.exports = new API();
 module.exports.custom = API;
