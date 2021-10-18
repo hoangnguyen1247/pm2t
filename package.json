@@ -39,7 +39,7 @@
         "type-check": "tsc -p tsconfig.types.json --noEmit",
         "build:lib": "babel src --out-dir lib --extensions \".js,.ts,.tsx\"",
         "build": "npm run clean:build && npm run build:lib && npm run copy:src",
-        "copy:src": "node ./CopyNonTsFiles.js",
+        "copy:src": "node ./CopyNonTsFiles.js && cp src/motd lib/motd",
         "release": "semantic-release",
         "test": "bash test/unit.sh && bash test/e2e.sh"
     },
