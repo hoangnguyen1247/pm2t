@@ -28,7 +28,7 @@
     "types": "types/index.d.ts",
     "scripts": {
         "clean:build": "rimraf lib",
-        "start": "node -r ts-node/register ./src/binaries/CLI.ts",
+        "start": "node -r ts-node/register ./testbin/pm2t.ts",
         "start:bin": "node ./bin/pm2t",
         "start:ts": "ts-node ./src/binaries/CLI",
         "dev": "ts-node ./src/binaries/CLI",
