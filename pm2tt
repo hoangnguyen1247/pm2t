@@ -1,0 +1,3 @@
+#!/usr/bin/env ts-node
+
+require('./src/binaries/CLI.ts');

@@ -9,6 +9,8 @@ import fs from "fs";
 import path from "path";
 import eachLimit from "async/eachLimit";
 import series from "async/series";
+import eachSeries from "async/eachSeries";
+import forEachLimit from "async/forEachLimit";
 import debugLogger from "debug";
 import util from "util";
 import chalk from "chalk";
@@ -48,10 +50,8 @@ import pm2Deploy from "../submodules/pm2t-deploy";
 
 import { AnyObject } from "../TypeUtils";
 
-import eachSeries from "async/eachSeries";
 import child from "child_process";
 
-import forEachLimit from "async/forEachLimit";
 import { tmpdir as tmpPath } from "os";
 import which from "../tools/which";
 

@@ -47,7 +47,7 @@
         "pm2t"
     ],
     "bin": {
-        "pm2t": "./bin/pm2t",
+        "pm2t": "./pm2t",
         "pm2t-dev": "./bin/pm2t-dev",
         "pm2t-docker": "./bin/pm2t-docker",
         "pm2t-runtime": "./bin/pm2t-runtime"
