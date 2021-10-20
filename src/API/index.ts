@@ -56,7 +56,7 @@ import { tmpdir as tmpPath } from "os";
 import which from "../tools/which";
 
 import { spawn } from "child_process";
-import Promise from "../tools/promise.min";
+// import Promise from "../tools/promise.min";
 
 import forEach from "async/forEach";
 
@@ -367,7 +367,8 @@ function detectInitSystem() {
     }
 
     if (i >= init_systems.length) {
-        Common.printError(cst.PREFIX_MSG_ERR + "Init system not found");
+        // Common.printError(cst.PREFIX_MSG_ERR + "Init system not found");
+        Common.printError(new Error(cst.PREFIX_MSG_ERR + "Init system not found").stack);
         return null;
     }
     Common.printOut(cst.PREFIX_MSG + "Init System found: " + chalk.bold(hash_map[init_systems[i]]));
@@ -397,7 +398,7 @@ function pspawn(cmd) {
                 console.log(chalk.bold.red("Command failed"));
                 return reject(new Error("Bad cmd return"));
             }
-            return resolve();
+            return resolve({});
         });
 
         install_instance.on("error", function (err) {
@@ -421,7 +422,7 @@ function checkDockerSetup() {
                 }
                 return reject(err);
             }
-            return resolve();
+            return resolve({});
         });
     });
 }
@@ -1000,7 +1001,8 @@ class API {
 
         const delay = Common.lockReload();
         if (delay > 0 && opts.force != true) {
-            Common.printError(conf.PREFIX_MSG_ERR + "Reload already in progress, please try again in " + Math.floor((conf.RELOAD_LOCK_TIMEOUT - delay) / 1000) + " seconds or use --force");
+            // Common.printError(conf.PREFIX_MSG_ERR + "Reload already in progress, please try again in " + Math.floor((conf.RELOAD_LOCK_TIMEOUT - delay) / 1000) + " seconds or use --force");
+            Common.printError(new Error(conf.PREFIX_MSG_ERR + "Reload already in progress, please try again in " + Math.floor((conf.RELOAD_LOCK_TIMEOUT - delay) / 1000) + " seconds or use --force").stack);
             return cb ? cb(new Error("Reload in progress")) : this.exitCli(conf.ERROR_EXIT);
         }
 
@@ -1225,6 +1227,7 @@ class API {
      * @param {string} script script name (will be resolved according to location)
      */
     _startScript = (script, opts, cb) => {
+        console.log("script", script);
         if (typeof opts == "function") {
             cb = opts;
             opts = {};
@@ -1234,6 +1237,7 @@ class API {
          * Commander.js tricks
          */
         let app_conf: any = Config.filterOptions(opts);
+        console.log("app_conf 1", app_conf);
         let appConf = {};
 
         if (typeof app_conf.name == "function") {
@@ -1255,12 +1259,15 @@ class API {
         if (!app_conf.namespace) {
             app_conf.namespace = "default";
         }
+        console.log("app_conf 2", app_conf);
 
         if ((appConf = Common.verifyConfs(app_conf)) instanceof Error) {
             Common.err(appConf);
             return cb ? cb(Common.retErr(appConf)) : this.exitCli(conf.ERROR_EXIT);
         }
 
+        console.log("app_conf 3", app_conf);
+        console.log("appConf", appConf);
         app_conf = appConf[0];
 
         if (opts.watchDelay) {
@@ -1414,12 +1421,16 @@ class API {
                 let resolved_paths = null;
 
                 try {
+                    console.log("cwd", this.cwd);
+                    console.log("pm2_home", this.pm2_home);
+                    console.log("app_conf", app_conf);
                     resolved_paths = Common.resolveAppAttributes({
                         cwd: this.cwd,
                         pm2_home: this.pm2_home
                     }, app_conf);
                 } catch (e: any) {
-                    Common.err(e.message);
+                    // Common.err(e.message);
+                    Common.err(e);
                     return cb(Common.retErr(e));
                 }
 
@@ -1441,6 +1452,7 @@ class API {
 
                 this.Client.executeRemote("prepare", resolved_paths, function (err, data) {
                     if (err) {
+                        // Common.printError(conf.PREFIX_MSG_ERR + "Error while launching application", err.stack || err);
                         Common.printError(conf.PREFIX_MSG_ERR + "Error while launching application", err.stack || err);
                         return cb(Common.retErr(err));
                     }
@@ -1509,14 +1521,16 @@ class API {
             try {
                 data = fs.readFileSync(file_path);
             } catch (e) {
-                Common.printError(conf.PREFIX_MSG_ERR + "File " + file + " not found");
+                // Common.printError(conf.PREFIX_MSG_ERR + "File " + file + " not found");
+                Common.printError(new Error(conf.PREFIX_MSG_ERR + "File " + file + " not found").stack);
                 return cb ? cb(Common.retErr(e)) : this.exitCli(conf.ERROR_EXIT);
             }
 
             try {
                 config = Common.parseConfig(data, file);
             } catch (e) {
-                Common.printError(conf.PREFIX_MSG_ERR + "File " + file + " malformated");
+                // Common.printError(conf.PREFIX_MSG_ERR + "File " + file + " malformated");
+                Common.printError(new Error(conf.PREFIX_MSG_ERR + "File " + file + " malformated").stack);
                 console.error(e);
                 return cb ? cb(Common.retErr(e)) : this.exitCli(conf.ERROR_EXIT);
             }
@@ -1770,11 +1784,13 @@ class API {
                 }
                 this.Client.executeRemote("prepare", resolved_paths, (err, data) => {
                     if (err) {
-                        Common.printError(conf.PREFIX_MSG_ERR + "Process failed to launch %s", err.message ? err.message : err);
+                        // Common.printError(conf.PREFIX_MSG_ERR + "Process failed to launch %s", err.message ? err.message : err);
+                        Common.printError(conf.PREFIX_MSG_ERR + "Process failed to launch %s", err.stack ? err.stack : err);
                         return next();
                     }
                     if (data.length === 0) {
-                        Common.printError(conf.PREFIX_MSG_ERR + "Process config loading failed", data);
+                        // Common.printError(conf.PREFIX_MSG_ERR + "Process config loading failed", data);
+                        Common.printError(new Error(conf.PREFIX_MSG_ERR + "Process config loading failed").stack);
                         return next();
                     }
 
@@ -1815,14 +1831,16 @@ class API {
             try {
                 data = fs.readFileSync(file);
             } catch (e) {
-                Common.printError(conf.PREFIX_MSG_ERR + "File " + file + " not found");
+                // Common.printError(conf.PREFIX_MSG_ERR + "File " + file + " not found");
+                Common.printError(new Error(conf.PREFIX_MSG_ERR + "File " + file + " not found").stack);
                 return cb ? cb(Common.retErr(e)) : this.exitCli(conf.ERROR_EXIT);
             }
 
             try {
                 appConf = Common.parseConfig(data, file);
             } catch (e) {
-                Common.printError(conf.PREFIX_MSG_ERR + "File " + file + " malformated");
+                // Common.printError(conf.PREFIX_MSG_ERR + "File " + file + " malformated");
+                Common.printError(new Error(conf.PREFIX_MSG_ERR + "File " + file + " malformated").stack);
                 console.error(e);
                 return cb ? cb(Common.retErr(e)) : this.exitCli(conf.ERROR_EXIT);
             }
@@ -2009,7 +2027,8 @@ class API {
 
                 this.Client.executeRemote(action_name, opts, (err, res) => {
                     if (err) {
-                        Common.printError(conf.PREFIX_MSG_ERR + "Process %s not found", id);
+                        // Common.printError(conf.PREFIX_MSG_ERR + "Process %s not found", id);
+                        Common.printError(new Error(conf.PREFIX_MSG_ERR + "Process %s not found" + id).stack);
                         return next(`Process ${id} not found`);
                     }
 
@@ -2141,7 +2160,8 @@ class API {
                         return cb ? cb(Common.retErr(err)) : this.exitCli(conf.ERROR_EXIT);
                     }
                     if (!ns_process_ids || ns_process_ids.length === 0) {
-                        Common.printError(conf.PREFIX_MSG_ERR + "Process or Namespace %s not found", process_name);
+                        // Common.printError(conf.PREFIX_MSG_ERR + "Process or Namespace %s not found", process_name);
+                        Common.printError(new Error(conf.PREFIX_MSG_ERR + "Process or Namespace %s not found" + process_name).stack);
                         return cb ? cb(new Error("process or namespace not found")) : this.exitCli(conf.ERROR_EXIT);
                     }
 
@@ -2168,7 +2188,8 @@ class API {
                     if (process_name > higher_id) {
                         return DockerMgmt.processCommand(this, higher_id, process_name, action_name, (err) => {
                             if (err) {
-                                Common.printError(conf.PREFIX_MSG_ERR + (err.message ? err.message : err));
+                                // Common.printError(conf.PREFIX_MSG_ERR + (err.message ? err.message : err));
+                                Common.printError(conf.PREFIX_MSG_ERR + (err.stack ? err.stack : err));
                                 return cb ? cb(Common.retErr(err)) : this.exitCli(conf.ERROR_EXIT);
                             }
 
@@ -2453,7 +2474,8 @@ class API {
             }
 
             if (!procs || procs.length === 0) {
-                Common.printError(conf.PREFIX_MSG_ERR + "Application %s not found", app_name);
+                // Common.printError(conf.PREFIX_MSG_ERR + "Application %s not found", app_name);
+                Common.printError(new Error(conf.PREFIX_MSG_ERR + "Application %s not found" + app_name).stack);
                 return cb ? cb(new Error("App not found")) : this.exitCli(conf.ERROR_EXIT);
             }
 
@@ -2474,7 +2496,8 @@ class API {
                 } else if (number > 0) {
                     return addProcs(procs[0], number, end);
                 } else {
-                    Common.printError(conf.PREFIX_MSG_ERR + "Nothing to do");
+                    // Common.printError(conf.PREFIX_MSG_ERR + "Nothing to do");
+                    Common.printError(new Error(conf.PREFIX_MSG_ERR + "Nothing to do").stack);
                     return cb ? cb(new Error("Same process number")) : this.exitCli(conf.ERROR_EXIT);
                 }
             }
@@ -2682,7 +2705,8 @@ class API {
 
         this.Client.executeRemote("getMonitorData", {}, (err, list) => {
             if (err) {
-                Common.printError(cst.PREFIX_MSG_ERR + err);
+                // Common.printError(cst.PREFIX_MSG_ERR + err);
+                Common.printError(new Error(cst.PREFIX_MSG_ERR + err).stack);
                 return cb ? cb(Common.retErr(err)) : this.exitCli(cst.ERROR_EXIT);
             }
 
@@ -2809,7 +2833,8 @@ class API {
 
         this.Client.executeRemote("sendLineToStdin", packet, (err, res) => {
             if (err) {
-                Common.printError(cst.PREFIX_MSG_ERR + err);
+                // Common.printError(cst.PREFIX_MSG_ERR + err);
+                Common.printError(new Error(cst.PREFIX_MSG_ERR + err).stack);
                 return cb ? cb(Common.retErr(err)) : this.exitCli(cst.ERROR_EXIT);
             }
             return cb ? cb(null, res) : this.speedList();
@@ -3013,7 +3038,8 @@ class API {
 
         this.start(filepath, (err, res) => {
             if (err) {
-                Common.printError(cst.PREFIX_MSG_ERR + "Error while trying to serve : " + err.message || err);
+                // Common.printError(cst.PREFIX_MSG_ERR + "Error while trying to serve : " + err.message || err);
+                Common.printError(cst.PREFIX_MSG_ERR + "Error while trying to serve : " + err.stack || err);
                 return cb ? cb(err) : this.speedList(cst.ERROR_EXIT);
             }
             return cb ? cb(null) : this.speedList();
@@ -3061,7 +3087,8 @@ class API {
 
         this.start(filepath, opts, (err, res) => {
             if (err) {
-                Common.printError(cst.PREFIX_MSG_ERR + "Error while trying to serve : " + err.message || err);
+                // Common.printError(cst.PREFIX_MSG_ERR + "Error while trying to serve : " + err.message || err);
+                Common.printError(cst.PREFIX_MSG_ERR + "Error while trying to serve : " + err.stack || err);
                 return cb ? cb(err) : this.speedList(cst.ERROR_EXIT);
             }
             Common.printOut(cst.PREFIX_MSG + "Serving " + servePath + " on port " + servePort);
@@ -3324,7 +3351,8 @@ class API {
 
         Modularizer.install(this, module_name, opts, (err, data) => {
             if (err) {
-                Common.printError(cst.PREFIX_MSG_ERR + (err.message || err));
+                // Common.printError(cst.PREFIX_MSG_ERR + (err.message || err));
+                Common.printError(cst.PREFIX_MSG_ERR + (err.stack || err));
                 return cb ? cb(Common.retErr(err)) : this.speedList(cst.ERROR_EXIT);
             }
             return cb ? cb(null, data) : this.speedList(cst.SUCCESS_EXIT);
@@ -4177,7 +4205,8 @@ class API {
         try {
             fs.writeFileSync(destination, template);
         } catch (e: any) {
-            console.error(cst.PREFIX_MSG_ERR + "Failure when trying to write startup script");
+            // console.error(cst.PREFIX_MSG_ERR + "Failure when trying to write startup script");
+            console.error(new Error(cst.PREFIX_MSG_ERR + "Failure when trying to write startup script").stack);
             console.error(e.message || e);
             return cb(e);
         }
@@ -4199,7 +4228,8 @@ class API {
 
         }, function (err) {
             if (err) {
-                console.error(cst.PREFIX_MSG_ERR + (err.message || err));
+                // console.error(cst.PREFIX_MSG_ERR + (err.message || err));
+                console.error(cst.PREFIX_MSG_ERR + (err.stack || err));
                 return cb(err);
             }
             Common.printOut(chalk.bold.blue("+---------------------------------------+"));
@@ -4284,7 +4314,8 @@ class API {
                     }
                 } catch (e: any) {
                     console.error(e.stack || e);
-                    Common.printOut(cst.PREFIX_MSG_ERR + "Failed to back up dump file in %s", cst.DUMP_BACKUP_FILE_PATH);
+                    // Common.printOut(cst.PREFIX_MSG_ERR + "Failed to back up dump file in %s", cst.DUMP_BACKUP_FILE_PATH);
+                    Common.printOut(new Error(cst.PREFIX_MSG_ERR + "Failed to back up dump file in %s"+ cst.DUMP_BACKUP_FILE_PATH).stack);
                 }
 
                 // Overwrite dump file, delete if broken and exit
@@ -4302,7 +4333,8 @@ class API {
                         fs.unlinkSync(cst.DUMP_FILE_PATH);
                         console.error(e.stack || e);
                     }
-                    Common.printOut(cst.PREFIX_MSG_ERR + "Failed to save dump file in %s", cst.DUMP_FILE_PATH);
+                    // Common.printOut(cst.PREFIX_MSG_ERR + "Failed to save dump file in %s", cst.DUMP_FILE_PATH);
+                    Common.printOut(new Error(cst.PREFIX_MSG_ERR + "Failed to save dump file in %s" + cst.DUMP_FILE_PATH).stack);
                     return this.exitCli(cst.ERROR_EXIT);
                 }
                 if (cb) {
@@ -4363,7 +4395,8 @@ class API {
             try {
                 apps = fs.readFileSync(dumpFilePath);
             } catch (e) {
-                Common.printError(cst.PREFIX_MSG_ERR + "Failed to read dump file in %s", dumpFilePath);
+                // Common.printError(cst.PREFIX_MSG_ERR + "Failed to read dump file in %s", dumpFilePath);
+                Common.printError(new Error(cst.PREFIX_MSG_ERR + "Failed to read dump file in %s" + dumpFilePath).stack);
                 throw e;
             }
 
@@ -4375,7 +4408,8 @@ class API {
             try {
                 processes = Common.parseConfig(apps, "none");
             } catch (e) {
-                Common.printError(cst.PREFIX_MSG_ERR + "Failed to parse dump file in %s", dumpFilePath);
+                // Common.printError(cst.PREFIX_MSG_ERR + "Failed to parse dump file in %s", dumpFilePath);
+                Common.printError(new Error(cst.PREFIX_MSG_ERR + "Failed to parse dump file in %s"+ dumpFilePath).stack);
                 try {
                     fs.unlinkSync(dumpFilePath);
                 } catch (e: any) {
@@ -4396,7 +4430,8 @@ class API {
                 apps = readDumpFile(cst.DUMP_BACKUP_FILE_PATH);
                 processes = parseDumpFile(cst.DUMP_BACKUP_FILE_PATH, apps);
             } catch (e) {
-                Common.printError(cst.PREFIX_MSG_ERR + "No processes saved; DUMP file doesn't exist");
+                // Common.printError(cst.PREFIX_MSG_ERR + "No processes saved; DUMP file doesn't exist");
+                Common.printError(new Error(cst.PREFIX_MSG_ERR + "No processes saved; DUMP file doesn't exist").stack);
                 // if (cb) return cb(Common.retErr(e));
                 // else return that.exitCli(cst.ERROR_EXIT);
                 return this.speedList();
@@ -5135,7 +5170,8 @@ class API {
      */
     monitorState = (state, target, cb?) => {
         if (!target) {
-            Common.printError(cst.PREFIX_MSG_ERR + "Please specify an <app_name|pm_id>");
+            // Common.printError(cst.PREFIX_MSG_ERR + "Please specify an <app_name|pm_id>");
+            Common.printError(new Error(cst.PREFIX_MSG_ERR + "Please specify an <app_name|pm_id>").stack);
             return cb ? cb(new Error("argument missing")) : this.exitCli(cst.ERROR_EXIT);
         }
 

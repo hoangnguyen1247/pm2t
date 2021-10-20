@@ -1,4 +1,4 @@
-import { AnyObject } from "TypeUtils";
+import { AnyObject } from "../TypeUtils";
 
 export {};
 

@@ -355,10 +355,12 @@ class Client{
             if (e.code === "EACCES") {
                 fs.stat(this.conf.DAEMON_RPC_PORT, (e, stats) => {
                     if (stats.uid === 0) {
-                        console.error(this.conf.PREFIX_MSG_ERR + "Permission denied, to give access to current user:");
+                        // console.error(this.conf.PREFIX_MSG_ERR + "Permission denied, to give access to current user:");
+                        console.log(new Error(this.conf.PREFIX_MSG_ERR + "Permission denied, to give access to current user:").stack);
                         console.log("$ sudo chown " + process.env.USER + ":" + process.env.USER + " " + this.conf.DAEMON_RPC_PORT + " " + this.conf.DAEMON_PUB_PORT);
                     } else {
-                        console.error(this.conf.PREFIX_MSG_ERR + "Permission denied, check permissions on " + this.conf.DAEMON_RPC_PORT);
+                        // console.error(this.conf.PREFIX_MSG_ERR + "Permission denied, check permissions on " + this.conf.DAEMON_RPC_PORT);
+                        console.log(new Error(this.conf.PREFIX_MSG_ERR + "Permission denied, check permissions on " + this.conf.DAEMON_RPC_PORT).stack);
                     }
 
                     process.exit(1);

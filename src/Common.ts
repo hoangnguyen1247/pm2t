@@ -72,12 +72,15 @@ const resolveNodeInterpreter = function (app) {
 
     const nvm_path = cst.IS_WINDOWS ? process.env.NVM_HOME : process.env.NVM_DIR;
     if (!nvm_path) {
-        Common.printError(cst.PREFIX_MSG_ERR + chalk.red("NVM is not available in PATH"));
-        Common.printError(cst.PREFIX_MSG_ERR + chalk.red("Fallback to node in PATH"));
+        // Common.printError(cst.PREFIX_MSG_ERR + chalk.red("NVM is not available in PATH"));
+        Common.printError(new Error(cst.PREFIX_MSG_ERR + chalk.red("NVM is not available in PATH")).stack);
+        // Common.printError(cst.PREFIX_MSG_ERR + chalk.red("Fallback to node in PATH"));
+        Common.printError(new Error(cst.PREFIX_MSG_ERR + chalk.red("Fallback to node in PATH")).stack);
         const msg = cst.IS_WINDOWS
             ? "https://github.com/coreybutler/nvm-windows/releases/"
             : "$ curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash";
-        Common.printOut(cst.PREFIX_MSG_ERR + chalk.bold("Install NVM:\n" + msg));
+        // Common.printOut(cst.PREFIX_MSG_ERR + chalk.bold("Install NVM:\n" + msg));
+        Common.printOut(new Error(cst.PREFIX_MSG_ERR + chalk.bold("Install NVM:\n" + msg)).stack);
     } else {
         const node_version = app.exec_interpreter.split("@")[1];
         const path_to_node = cst.IS_WINDOWS
@@ -323,7 +326,8 @@ const Common = {
                     try {
                         mkdirp.sync(dir);
                     } catch (err) {
-                        Common.printError(cst.PREFIX_MSG_ERR + "Could not create folder: " + path.dirname(af));
+                        // Common.printError(cst.PREFIX_MSG_ERR + "Could not create folder: " + path.dirname(af));
+                        Common.printError(new Error(cst.PREFIX_MSG_ERR + "Could not create folder: " + path.dirname(af)).stack);
                         throw new Error("Could not create folder");
                     }
                 }
@@ -536,23 +540,32 @@ const Common = {
     },
 
     err: (msg) => {
+        console.log("Error 1");
         if (process.env.PM2_SILENT || process.env.PM2_PROGRAMMATIC === "true") {
             return false;
         }
         if (msg instanceof Error) {
-            return console.error(`${cst.PREFIX_MSG_ERR}${msg.message}`);
+            console.log("Error 11");
+            // return console.error(`${cst.PREFIX_MSG_ERR}${msg.message}`);
+            return console.error(`${cst.PREFIX_MSG_ERR}${msg.stack}`);
         }
+        console.trace("Error 12");
         return console.error(`${cst.PREFIX_MSG_ERR}${msg}`);
     },
 
     printError: (...args) => {
+        console.log("Error 2");
         const [ msg ] = args;
         if (process.env.PM2_SILENT || process.env.PM2_PROGRAMMATIC === "true") {
             return false;
         }
         if (msg instanceof Error) {
-            return console.error(msg.message);
+            console.log("Error 21");
+            // return console.error(msg.message);
+            return console.error(msg.stack);
         }
+        console.log("Error 22");
+        // return console.error(...args);
         return console.error(...args);
     },
 
@@ -711,8 +724,10 @@ const Common = {
      * @return app
      */
     resolveAppAttributes: (opts, conf) => {
+        console.log("conf", conf);
         const conf_copy = fclone(conf);
 
+        console.log("conf_copy", conf_copy);
         const app = Common.prepareAppConf(opts, conf_copy);
         if (app instanceof Error) {
             throw new Error(app.message);
@@ -806,13 +821,15 @@ const Common = {
             if (app.uid || app.gid || app.user) {
                 // 1/ Check if windows
                 if (cst.IS_WINDOWS === true) {
-                    Common.printError(cst.PREFIX_MSG_ERR + "--uid and --git does not works on windows");
+                    // Common.printError(cst.PREFIX_MSG_ERR + "--uid and --git does not works on windows");
+                    Common.printError(new Error(cst.PREFIX_MSG_ERR + "--uid and --git does not works on windows").stack);
                     return new Error("--uid and --git does not works on windows");
                 }
 
                 // 2/ Verify that user is root (todo: verify if other has right)
                 if (process.env.NODE_ENV != "test" && process.getuid && process.getuid() !== 0) {
-                    Common.printError(cst.PREFIX_MSG_ERR + "To use --uid and --gid please run pm2 as root");
+                    // Common.printError(cst.PREFIX_MSG_ERR + "To use --uid and --gid please run pm2 as root");
+                    Common.printError(new Error(cst.PREFIX_MSG_ERR + "To use --uid and --gid please run pm2 as root").stack);
                     return new Error("To use UID and GID please run PM2 as root");
                 }
 
@@ -827,7 +844,8 @@ const Common = {
 
                 const user_info = users[app.uid || app.user];
                 if (!user_info) {
-                    Common.printError(`${cst.PREFIX_MSG_ERR} User ${app.uid || app.user} cannot be found`);
+                    // Common.printError(`${cst.PREFIX_MSG_ERR} User ${app.uid || app.user} cannot be found`);
+                    Common.printError(new Error(`${cst.PREFIX_MSG_ERR} User ${app.uid || app.user} cannot be found`).stack);
                     return new Error(`${cst.PREFIX_MSG_ERR} User ${app.uid || app.user} cannot be found`);
                 }
 
@@ -846,6 +864,7 @@ const Common = {
                     const group_info = groups[app.gid];
                     if (!group_info) {
                         Common.printError(`${cst.PREFIX_MSG_ERR} Group ${app.gid} cannot be found`);
+                        Common.printError(new Error(`${cst.PREFIX_MSG_ERR} Group ${app.gid} cannot be found`).stack);
                         return new Error(`${cst.PREFIX_MSG_ERR} Group ${app.gid} cannot be found`);
                     }
                     app.gid = parseInt(group_info.id);
