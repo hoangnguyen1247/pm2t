@@ -67,7 +67,7 @@ class Daemon {
 
             console.error("[PM2] Resurrecting PM2");
 
-            const path = cst.IS_WINDOWS ? __dirname + "/../bin/pm2" : process.env["_"];
+            const path = cst.IS_WINDOWS ? __dirname + "/../pm2t" : process.env["_"];
             const fork_new_pm2 = spawn("node", [path, "update"], {
                 detached: true,
                 stdio: "inherit"

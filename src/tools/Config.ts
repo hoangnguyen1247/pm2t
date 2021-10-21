@@ -152,13 +152,13 @@ const Config = {
      * @returns {*}
      * @private
      */
-    _valid: function (key, value, sch) {
-        var sch = sch || this.schema[key],
-            scht = typeof sch.type == 'string' ? [sch.type] : sch.type;
+    _valid: function (key, value, _sch) {
+        const sch = _sch || this.schema[key];
+        let scht = typeof sch.type == "string" ? [sch.type] : sch.type;
 
         // Required value.
-        var undef = typeof value == 'undefined';
-        if (this._error(sch.require && undef, 'require', key)) {
+        const undef = typeof value == "undefined";
+        if (this._error(sch.require && undef, "require", key)) {
             return null;
         }
 
@@ -169,42 +169,43 @@ const Config = {
 
         // Wrap schema types.
         scht = scht.map(function (t) {
-            return '[object ' + t[0].toUpperCase() + t.slice(1) + ']'
+            return "[object " + t[0].toUpperCase() + t.slice(1) + "]";
         });
 
         // Typeof value.
-        var type = Object.prototype.toString.call(value), nt = '[object Number]';
+        let type = Object.prototype.toString.call(value);
+        const nt = "[object Number]";
 
         // Auto parse Number
-        if (type != '[object Boolean]' && scht.indexOf(nt) >= 0 && !isNaN(value)) {
+        if (type != "[object Boolean]" && scht.indexOf(nt) >= 0 && !isNaN(value)) {
             value = parseFloat(value);
             type = nt;
         }
 
         // Verify types.
-        if (this._error(!~scht.indexOf(type), 'type', key, scht.join(' / '), type)) {
+        if (this._error(!~scht.indexOf(type), "type", key, scht.join(" / "), type)) {
             return null;
         }
 
         // Verify RegExp if exists.
-        if (this._error(type == '[object String]' && sch.regex && !(new RegExp(sch.regex)).test(value),
-            'regex', key, sch.desc || ('should match ' + sch.regex))) {
+        if (this._error(type == "[object String]" && sch.regex && !(new RegExp(sch.regex)).test(value),
+            "regex", key, sch.desc || ("should match " + sch.regex))) {
             return null;
         }
 
         // Verify maximum / minimum of Number value.
-        if (type == '[object Number]') {
-            if (this._error(typeof sch.max != 'undefined' && value > sch.max, 'max', key, sch.max, value)) {
+        if (type == "[object Number]") {
+            if (this._error(typeof sch.max != "undefined" && value > sch.max, "max", key, sch.max, value)) {
                 return null;
             }
-            if (this._error(typeof sch.min != 'undefined' && value < sch.min, 'min', key, sch.min, value)) {
+            if (this._error(typeof sch.min != "undefined" && value < sch.min, "min", key, sch.min, value)) {
                 return null;
             }
         }
 
         // If first type is Array, but current is String, try to split them.
-        if (scht.length > 1 && type != scht[0] && type == '[object String]') {
-            if (scht[0] == '[object Array]') {
+        if (scht.length > 1 && type != scht[0] && type == "[object String]") {
+            if (scht[0] == "[object Array]") {
                 // unfortunately, js does not support lookahead RegExp (/(?<!\\)\s+/) now (until next ver).
                 value = value.split(/([\w\-]+\="[^"]*")|([\w\-]+\='[^']*')|"([^"]*)"|'([^']*)'|\s/)
                     .filter(function (v) {
@@ -214,17 +215,17 @@ const Config = {
         }
 
         // Custom types: sbyte && stime.
-        if (sch.ext_type && type == '[object String]' && value.length >= 2) {
-            var seed = {
-                'sbyte': {
-                    'G': 1024 * 1024 * 1024,
-                    'M': 1024 * 1024,
-                    'K': 1024
+        if (sch.ext_type && type == "[object String]" && value.length >= 2) {
+            const seed = {
+                "sbyte": {
+                    "G": 1024 * 1024 * 1024,
+                    "M": 1024 * 1024,
+                    "K": 1024
                 },
-                'stime': {
-                    'h': 60 * 60 * 1000,
-                    'm': 60 * 1000,
-                    's': 1000
+                "stime": {
+                    "h": 60 * 60 * 1000,
+                    "m": 60 * 1000,
+                    "s": 1000
                 }
             }[sch.ext_type];
 

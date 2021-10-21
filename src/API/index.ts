@@ -955,7 +955,7 @@ class API {
         this.getVersion((err, new_version) => {
             // If not linked to PM2 plus, and update PM2 to latest, display motd.update
             if (!this.gl_is_km_linked && !err && (pkg.version != new_version)) {
-                const dt = fs.readFileSync(path.join(__dirname, this._conf.PM2_UPDATE));
+                const dt = fs.readFileSync(path.resolve(__dirname, "../..", this._conf.PM2_UPDATE));
                 console.log(dt.toString());
             }
 

@@ -205,7 +205,7 @@ class Client{
                 version: pkg.version
             });
 
-            const dt = fs.readFileSync(path.join(__dirname, opts.PM2_BANNER));
+            const dt = fs.readFileSync(path.resolve(__dirname, "..", opts.PM2_BANNER));
             console.log(dt.toString());
             try {
                 fs.writeFileSync(path.join(opts.PM2_HOME, "touch"), Date.now().toString());
