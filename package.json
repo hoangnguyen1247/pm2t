@@ -1,7 +1,7 @@
 {
     "name": "pm2t",
     "preferGlobal": true,
-    "version": "4.5.24",
+    "version": "4.5.27",
     "engines": {
         "node": ">=8.10.0"
     },
@@ -28,7 +28,7 @@
     "types": "types/index.d.ts",
     "scripts": {
         "clean:build": "rimraf lib",
-        "start": "node -r ts-node/register ./src/binaries/CLI.ts",
+        "start": "node -r ts-node/register ./testbin/pm2t.ts",
         "start:bin": "node ./bin/pm2t",
         "start:ts": "ts-node ./src/binaries/CLI",
         "dev": "ts-node ./src/binaries/CLI",
@@ -47,7 +47,7 @@
         "pm2t"
     ],
     "bin": {
-        "pm2t": "./bin/pm2t",
+        "pm2t": "./pm2t",
         "pm2t-dev": "./bin/pm2t-dev",
         "pm2t-docker": "./bin/pm2t-docker",
         "pm2t-runtime": "./bin/pm2t-runtime"
