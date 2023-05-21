@@ -40,7 +40,8 @@
         "build:lib": "babel src --out-dir lib --extensions \".js,.ts,.tsx\"",
         "build": "npm run clean:build && npm run build:lib && npm run copy:src",
         "copy:src": "node ./CopyNonTsFiles.js && cp src/motd lib/motd",
-        "release": "semantic-release",
+        "release:dry-run": "semantic-release --no-ci --dry-run",
+        "release": "semantic-release --no-ci",
         "test": "bash test/unit.sh && bash test/e2e.sh"
     },
     "keywords": [
